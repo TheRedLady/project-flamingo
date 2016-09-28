@@ -15,7 +15,6 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
@@ -26,4 +25,7 @@ urlpatterns = [
     url(r'^posts/', include('posts.urls', namespace='posts')),
     url(r'^ratings/', include('star_ratings.urls', namespace='ratings', app_name='ratings')),
     url(r'^admin/', admin.site.urls),
+    url(r'^api/posts/', include('posts.api.urls', namespace='posts-api')),
+    url(r'^api-auth/', include('rest_framework.urls',
+                               namespace='rest_framework')),
 ]
