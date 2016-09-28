@@ -78,7 +78,7 @@ class ProfileCreateSerializer(ModelSerializer):
 
 class ProfileDetailSerializer(ModelSerializer):
 
-    user = MyUserDetailSerializer()
+    user = MyUserDetailSerializer(read_only=True)
     follows = FollowSerializer(read_only=True, many=True)
 
     class Meta:
@@ -88,6 +88,7 @@ class ProfileDetailSerializer(ModelSerializer):
             'birthdate',
             'follows',
         ]
+        extra_kwargs = {'birthdate': {'read_only': True}}
 
 
 class ProfileUpdateSerializer(ModelSerializer):
