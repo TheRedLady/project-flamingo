@@ -74,17 +74,46 @@ class LikeViewSet(ModelViewSet):
     queryset = Like.objects.all()
     serializer_class = PostLikeSerializer
     lookup_field = 'id'
-    lookup_url_kwarg = 'id'
 
-    @detail_route(methods=['get', 'post'], permission_classes=[IsAuthenticated, IsOwnerOrReadOnly])
-    def like(self, request, pk=None):
-        user = self.request.user
-        print "REQUEST QUERY PARAMETERS ", self.request.query_params
-        pk = self.request.query_params['id']
-        serializer = PostLikeSerializer(data=request.data)
+    @detail_route(methods=['get', 'post'], permission_classes=[IsAuthenticated])
+    def like(self, request, id=None):
+        user = self.request.user.id
         try:
-            obj, created = Like.objects.get_or_create(Like, liked_by=user, post=pk)
-            return Response({'liked_by_user': True})
+            post = Post.objects.get(id)
         except:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+            Response({"status": "Error: No post with id {}".format(id)})
+
+        if request.method == 'GET':
+            try:
+                Like.objects.get(liked_by=user, post=post)
+                return Response({"status": "Post {} IS liked by {}".format(id, user)})
+            except:
+                return Response({"status": "Post {} is NOT liked by {}".format(id ,user)})
+
+        if request.method == 'POST':
+            Like.objects.get_or_create(liked_by=user, post=post)
+            return Response({"status": "You liked this post {}".format(post.content)})
+
+    # @detail_route(methods=['get', 'post'], permission_classes=[IsAuthenticated])
+    # def unlike(self, request, pk=None):
+    #     profile = self.get_object()
+    #     current_profile = Profile.objects.get(user_id=self.request.user.id)
+    #     profile_data = ProfileDetailSerializer(profile).data
+    #     profile_data['status'] = ''
+    #     if profile.user_id == current_profile.user_id:
+    #         profile_data['status'] = 'User cannot follow self.'
+    #         return Response(profile_data)
+    #     if request.method == 'GET':
+    #         if current_profile in profile.followed_by.all():
+    #             profile_data['status'] = 'You are following this user.'
+    #         else:
+    #             profile_data['status'] = 'You are not following this user.'
+    #         return Response(profile_data)
+    #     if request.method == 'POST':
+    #         if current_profile not in profile.followed_by.all():
+    #             profile_data['status'] = 'You are not following this user.'
+    #         else:
+    #             current_profile.follows.remove(profile)
+    #             current_profile.save()
+    #             profile_data['status'] = 'You are no longer following this user.'
+    #         return Response(profile_data)

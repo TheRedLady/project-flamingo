@@ -35,3 +35,4 @@ class PostLikeSerializer(ModelSerializer):
     class Meta:
         model = Like
         fields = ['liked_by', 'post']
+        # read_only_fields = ['liked_by', 'post']
