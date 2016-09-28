@@ -15,6 +15,8 @@ from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework import status
 
+from django.db import IntegrityError
+
 from .permissions import IsOwnerOrReadOnly
 from posts.models import Post, Tag, Like, Share
 from .serializers import (
@@ -79,20 +81,27 @@ class LikeViewSet(ModelViewSet):
     def like(self, request, id=None):
         user = self.request.user.id
         try:
-            post = Post.objects.get(id)
+            post = Post.objects.get(id=id)
+            if request.method == 'GET':
+                try:
+                    Like.objects.get(liked_by=user, post=post)
+                    return Response({"status": "Post {} IS liked by {}".format(id, user)})
+                except Like.DoesNotExist:
+                    return Response({"status": "Post {} is NOT liked by {}".format(id, user)})
+
+            elif request.method == 'POST':
+                try:
+                    obj, created = Like.objects.get_or_create(liked_by=self.request.user, post=post)
+                    print "STUFF ", obj, created
+                    return Response({"status": "You liked this post {}".format(post.content)})
+                except Exception as ex:
+                    template = "An exception of type {0} occured. Arguments:\n{1!r}"
+                    message = template.format(type(ex).__name__, ex.args)
+                    print message
+                    return Response({"status": "Error! Exception {} occurred!".format(message)})
         except:
-            Response({"status": "Error: No post with id {}".format(id)})
+            return Response({"status": "Error: No post with id {}".format(id)})
 
-        if request.method == 'GET':
-            try:
-                Like.objects.get(liked_by=user, post=post)
-                return Response({"status": "Post {} IS liked by {}".format(id, user)})
-            except:
-                return Response({"status": "Post {} is NOT liked by {}".format(id ,user)})
-
-        if request.method == 'POST':
-            Like.objects.get_or_create(liked_by=user, post=post)
-            return Response({"status": "You liked this post {}".format(post.content)})
 
     # @detail_route(methods=['get', 'post'], permission_classes=[IsAuthenticated])
     # def unlike(self, request, pk=None):
