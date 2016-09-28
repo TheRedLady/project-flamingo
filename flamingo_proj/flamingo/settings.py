@@ -132,3 +132,11 @@ STATICFILES_DIRS = [
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'profiles:go-to-profile'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'PAGE_SIZE': 10
+}
