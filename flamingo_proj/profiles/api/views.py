@@ -48,13 +48,13 @@ class ProfileDeleteAPIView(DestroyAPIView):
 class ProfileViewSet(ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileDetailSerializer
+    permission_classes = [IsAuthenticated]
 
-    @detail_route(methods=['get', 'post'], permission_classes=[IsAuthenticated])
+    @detail_route(methods=['get', 'post'])
     def follow(self, request, pk=None):
         profile = self.get_object()
         current_profile = Profile.objects.get(user_id=self.request.user.id)
         profile_data = ProfileDetailSerializer(profile).data
-        profile_data['status'] = ''
         if profile.user_id == current_profile.user_id:
             profile_data['status'] = 'User cannot follow self.'
             return Response(profile_data)
@@ -73,12 +73,11 @@ class ProfileViewSet(ModelViewSet):
                 profile_data['status'] = 'You are now following this user.'
             return Response(profile_data)
 
-    @detail_route(methods=['get', 'post'], permission_classes=[IsAuthenticated])
+    @detail_route(methods=['get', 'post'])
     def unfollow(self, request, pk=None):
         profile = self.get_object()
         current_profile = Profile.objects.get(user_id=self.request.user.id)
         profile_data = ProfileDetailSerializer(profile).data
-        profile_data['status'] = ''
         if profile.user_id == current_profile.user_id:
             profile_data['status'] = 'User cannot follow self.'
             return Response(profile_data)
