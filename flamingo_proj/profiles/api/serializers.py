@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField
+from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField, ValidationError
 
 
 from profiles.models import MyUser, Profile
@@ -110,7 +110,9 @@ class ProfileUpdateSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         MyUserUpdateSerializer().update(instance.user, validated_data.pop('user'))
-        instance.birthdate = validated_data['birthdate']
+        instance.birthdate = validated_data.get('birthdate', instance.birthdate)
+        if instance in validated_data['follows']:
+            raise ValidationError("User cannot follow self.")
         for profile in validated_data['follows']:
             instance.follows.add(profile)
         instance.save()

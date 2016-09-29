@@ -27,13 +27,7 @@ class ProfileCreateAPIView(CreateAPIView):
     permission_classes = [IsNotAuthenticated]
 
 
-class ProfileDetailAPIView(RetrieveAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileDetailSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class ProfileEditAPIView(RetrieveUpdateAPIView):
+class ProfileDetailEditAPIView(RetrieveUpdateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileUpdateSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
