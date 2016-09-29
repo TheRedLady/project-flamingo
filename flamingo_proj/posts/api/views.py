@@ -1,3 +1,5 @@
+import sys, os
+
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
@@ -7,15 +9,12 @@ from rest_framework.generics import (
     )
 from rest_framework.permissions import (
     IsAuthenticated,
-    IsAuthenticatedOrReadOnly
     )
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
-from rest_framework import status
-
-from django.db import IntegrityError
+from rest_framework.mixins import DestroyModelMixin
 
 from .permissions import IsOwnerOrReadOnly
 from posts.models import Post, Tag, Like, Share
@@ -72,14 +71,15 @@ class PostEditAPIView(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
 
-class LikeViewSet(ModelViewSet):
+class LikeViewSet(ModelViewSet, DestroyModelMixin):
     queryset = Like.objects.all()
     serializer_class = PostLikeSerializer
     lookup_field = 'id'
+    permission_classes = [IsAuthenticated]
 
-    @detail_route(methods=['get', 'post'], permission_classes=[IsAuthenticated])
+    @detail_route(methods=['get', 'post'])
     def like(self, request, id=None):
-        user = self.request.user.id
+        user = self.request.user
         try:
             post = Post.objects.get(id=id)
             if request.method == 'GET':
@@ -91,38 +91,37 @@ class LikeViewSet(ModelViewSet):
 
             elif request.method == 'POST':
                 try:
-                    obj, created = Like.objects.get_or_create(liked_by=self.request.user, post=post)
-                    print "STUFF ", obj, created
-                    return Response({"status": "You liked this post {}".format(post.content)})
+                    obj, created = Like.objects.get_or_create(liked_by=user, post=post)
+                    return Response({"status": "{} liked this post {}".format(user, post)})
                 except Exception as ex:
                     template = "An exception of type {0} occured. Arguments:\n{1!r}"
                     message = template.format(type(ex).__name__, ex.args)
-                    print message
                     return Response({"status": "Error! Exception {} occurred!".format(message)})
         except:
             return Response({"status": "Error: No post with id {}".format(id)})
 
+    @detail_route(methods=['get', 'post'], permission_classes=[IsOwnerOrReadOnly])
+    def unlike(self, request, id=None):
+        user = self.request.user
+        try:
+            post = Post.objects.get(id=id)
+            if request.method == 'GET':
+                try:
+                    Like.objects.get(liked_by=user, post=post)
+                    return Response({"status": "Post {} IS liked by {}".format(id, user)})
+                except Like.DoesNotExist:
+                    return Response({"status": "Post {} is NOT liked by {}".format(id, user)})
 
-    # @detail_route(methods=['get', 'post'], permission_classes=[IsAuthenticated])
-    # def unlike(self, request, pk=None):
-    #     profile = self.get_object()
-    #     current_profile = Profile.objects.get(user_id=self.request.user.id)
-    #     profile_data = ProfileDetailSerializer(profile).data
-    #     profile_data['status'] = ''
-    #     if profile.user_id == current_profile.user_id:
-    #         profile_data['status'] = 'User cannot follow self.'
-    #         return Response(profile_data)
-    #     if request.method == 'GET':
-    #         if current_profile in profile.followed_by.all():
-    #             profile_data['status'] = 'You are following this user.'
-    #         else:
-    #             profile_data['status'] = 'You are not following this user.'
-    #         return Response(profile_data)
-    #     if request.method == 'POST':
-    #         if current_profile not in profile.followed_by.all():
-    #             profile_data['status'] = 'You are not following this user.'
-    #         else:
-    #             current_profile.follows.remove(profile)
-    #             current_profile.save()
-    #             profile_data['status'] = 'You are no longer following this user.'
-    #         return Response(profile_data)
+            if request.method == 'POST':
+                try:
+                    like = Like.objects.get(liked_by=user, post=post)
+                    like.delete()
+                    return Response({"status": "{} unliked by {}".format(post, user)})
+                except Like.DoesNotExist:
+                    return Response({"status": "Post {} is NOT liked by {}".format(id, user)})
+        except Post.DoesNotExist:
+            return Response({"status": "No post with id of {}".format(id)})
+        except Exception as ex:
+            template = "An exception of type {0} occured. Arguments:\n{1!r}"
+            message = template.format(type(ex).__name__, ex.args)
+            return Response({"status": "Error! Exception {} occurred!".format(message)})
