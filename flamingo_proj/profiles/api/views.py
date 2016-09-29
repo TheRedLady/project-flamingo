@@ -9,7 +9,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.filters import DjangoFilterBackend
+from rest_framework.filters import DjangoFilterBackend, OrderingFilter
 
 
 from profiles.models import Profile
@@ -101,5 +101,5 @@ class ProfileListAPIView(ListAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileDetailSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filter_fields = ['user__email', 'user__first_name', 'user__last_name', 'birthdate', 'follows']
