@@ -1,4 +1,5 @@
 import sys, os
+from .exceptions import PostNotFoundException
 
 from rest_framework.generics import (
     CreateAPIView,
@@ -6,6 +7,7 @@ from rest_framework.generics import (
     RetrieveAPIView,
     DestroyAPIView,
     RetrieveUpdateAPIView,
+    RetrieveUpdateDestroyAPIView
     )
 from rest_framework.permissions import (
     IsAuthenticated,
@@ -14,7 +16,10 @@ from rest_framework.permissions import (
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
-from rest_framework.mixins import DestroyModelMixin
+from rest_framework.mixins import (
+    DestroyModelMixin,
+    CreateModelMixin,
+)
 
 from .permissions import IsOwnerOrReadOnly
 from posts.models import Post, Tag, Like, Share
@@ -22,7 +27,8 @@ from .serializers import (
     PostDetailSerializer,
     PostListSerializer,
     PostCreateUpdateSerializer,
-    PostLikeSerializer
+    PostLikeSerializer,
+    PostShareSerializer
     )
 
 
@@ -50,13 +56,9 @@ class PostByTagAPIView(ListAPIView):
         return posts
 
 
-# Tova view moje da vryshta samo 1 element zashtoto izpylnqva get()
-# Inache vryshta greshka
 class PostDetailAPIView(RetrieveAPIView):
     queryset = Post.objects.all()
     serializer_class = PostDetailSerializer
-    # lookup_field = 'posted_by'  -  po koe pole ot modela tyrsim
-    # lookup_url_kwarg = 'field2'  -  kak da se kazva to v url patterna
 
 
 class PostDeleteAPIView(DestroyAPIView):
@@ -65,10 +67,14 @@ class PostDeleteAPIView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
 
-class PostEditAPIView(RetrieveUpdateAPIView):
+class PostEditAPIView(DestroyModelMixin,
+                      RetrieveUpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostCreateUpdateSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
 
 
 class LikeViewSet(ModelViewSet, DestroyModelMixin):
@@ -77,7 +83,6 @@ class LikeViewSet(ModelViewSet, DestroyModelMixin):
     lookup_field = 'id'
     permission_classes = [IsAuthenticated]
 
-    @detail_route(methods=['get', 'post'])
     def like(self, request, id=None):
         user = self.request.user
         try:
@@ -100,7 +105,6 @@ class LikeViewSet(ModelViewSet, DestroyModelMixin):
         except:
             return Response({"status": "Error: No post with id {}".format(id)})
 
-    @detail_route(methods=['get', 'post'], permission_classes=[IsOwnerOrReadOnly])
     def unlike(self, request, id=None):
         user = self.request.user
         try:
@@ -122,6 +126,62 @@ class LikeViewSet(ModelViewSet, DestroyModelMixin):
         except Post.DoesNotExist:
             return Response({"status": "No post with id of {}".format(id)})
         except Exception as ex:
-            template = "An exception of type {0} occured. Arguments:\n{1!r}"
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
             message = template.format(type(ex).__name__, ex.args)
             return Response({"status": "Error! Exception {} occurred!".format(message)})
+
+
+class LikeViewSetRemake(ModelViewSet):
+    queryset = Like.objects.all()
+    serializer_class = PostLikeSerializer
+    lookup_field = 'id'
+
+    # def list(self, request, *args, **kwargs):
+    #     result = Like.objects.filter(post=kwargs['id'])
+    #     return Response({'likes_for_post':
+    #                      self.serializer_class(result, many=True).data})
+
+    def create(self, request, *args, **kwargs):
+        user = self.request.user
+        try:
+            post = Post.objects.get(id=kwargs['id'])
+            Like.objects.get_or_create(liked_by=user, post=post)
+            # return self.retrieve(request)
+            return Response({"status": "True"})
+        except Post.DoesNotExist:
+            raise PostNotFoundException
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            Like.objects.get(post=kwargs['id'], liked_by=request.user)
+            return Response({"status": "True"})
+        except Like.DoesNotExist:
+            # To raise an error
+            return Response({"status": "False"})
+
+    # def destroy(self, request, *args, **kwargs):
+    #     try:
+    #         post = Post.objects.get(id=kwargs['id'])
+    #         like = Like.objects.get(liked_by=request.user, post=post)
+    #         like.delete()
+    #         return Response({
+    #             "message": "You successfully deleted post {}".format(id),
+    #             "status": "True"})
+    #     except Post.DoesNotExist:
+    #         raise PostNotFoundException
+    def perform_destroy(self, instance):
+        instance.delete()
+
+
+class ShareAPIView(CreateModelMixin,
+                   RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostShareSerializer
+    lookup_field = 'id'
+
+    def get(self, request, *args, **kwargs):
+        shares_of_post = Share.objects.filter(original_post=kwargs['id'])
+        return Response({'shares_of_post': self.serializer_class(shares_of_post, many=True).data})
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)

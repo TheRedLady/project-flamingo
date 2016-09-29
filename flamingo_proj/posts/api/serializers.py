@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField
-from posts.models import Post, Like
+from posts.models import Post, Like, Share
 
 
 class PostCreateUpdateSerializer(ModelSerializer):
@@ -36,3 +36,9 @@ class PostLikeSerializer(ModelSerializer):
         model = Like
         fields = ['liked_by', 'post']
         read_only_fields = ['liked_by', 'post']
+
+
+class PostShareSerializer(ModelSerializer):
+    class Meta:
+        model = Share
+        fields = '__all__'
