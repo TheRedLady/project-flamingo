@@ -109,6 +109,7 @@ class ProfileUpdateSerializer(ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
+        MyUserUpdateSerializer().update(instance.user, validated_data.pop('user'))
         instance.birthdate = validated_data['birthdate']
         for profile in validated_data['follows']:
             instance.follows.add(profile)
