@@ -54,7 +54,7 @@ class ProfileViewSet(ModelViewSet):
     def follow(self, request, pk=None):
         profile = self.get_object()
         current_profile = Profile.objects.get(user_id=self.request.user.id)
-        profile_data = ProfileDetailSerializer(profile).data
+        profile_data = ProfileDetailSerializer(profile, context={'request': request}).data
         if profile.user_id == current_profile.user_id:
             profile_data['status'] = 'User cannot follow self.'
             return Response(profile_data)
@@ -77,7 +77,7 @@ class ProfileViewSet(ModelViewSet):
     def unfollow(self, request, pk=None):
         profile = self.get_object()
         current_profile = Profile.objects.get(user_id=self.request.user.id)
-        profile_data = ProfileDetailSerializer(profile).data
+        profile_data = ProfileDetailSerializer(profile, context={'request': request}).data
         if profile.user_id == current_profile.user_id:
             profile_data['status'] = 'User cannot follow self.'
             return Response(profile_data)

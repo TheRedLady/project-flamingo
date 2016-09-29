@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField
 
 
 from profiles.models import MyUser, Profile
@@ -50,9 +50,12 @@ class MyUserUpdateSerializer(ModelSerializer):
 
 
 class FollowSerializer(ModelSerializer):
+
+    url = HyperlinkedIdentityField(view_name = 'profiles-api:detail')
+
     class Meta:
         model = Profile
-        fields = ['user_id']
+        fields = ['url', 'user_id']
 
 
 class ProfileCreateSerializer(ModelSerializer):
@@ -80,10 +83,12 @@ class ProfileDetailSerializer(ModelSerializer):
 
     user = MyUserDetailSerializer(read_only=True)
     follows = FollowSerializer(read_only=True, many=True)
+    url = HyperlinkedIdentityField(view_name = 'profiles-api:detail')
 
     class Meta:
         model = Profile
         fields = [
+            'url',
             'user',
             'birthdate',
             'follows',
