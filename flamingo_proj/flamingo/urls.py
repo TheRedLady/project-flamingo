@@ -18,12 +18,14 @@ from django.contrib import admin
 
 from .routers import router
 
+from .routers import router
+
+
 urlpatterns = [
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^', include('home.urls')),
-    url(r'^profile/', include('profiles.urls', namespace='profiles')),
     url(r'^api/', include(router.urls)),
-    url(r'^api/profiles/', include('profiles.api.urls', namespace='profiles-api')),
+    url(r'^profile/', include('profiles.urls', namespace='profiles')),
     url(r'^messages/', include('messaging.urls', namespace='messages')),
     url(r'^posts/', include('posts.urls', namespace='posts')),
     url(r'^ratings/', include('star_ratings.urls', namespace='ratings', app_name='ratings')),
