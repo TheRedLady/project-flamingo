@@ -57,7 +57,7 @@ class PostAPIViewSet(ModelViewSet):
             serializer = PostLikeSerializer(data=data)
 
             if serializer.is_valid():
-                print serializer.data
+                print serializer.data.items()
                 serializer.save()
                 return Response({
                     'status': 'True',
