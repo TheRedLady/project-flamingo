@@ -9,7 +9,8 @@ from django.http import JsonResponse
 
 
 from .forms import PostForm
-from .models import Tag, Post, Like, Share
+
+from .models import Post, Tag, Like, Share
 
 
 class PostView(LoginRequiredMixin, generic.DetailView):
