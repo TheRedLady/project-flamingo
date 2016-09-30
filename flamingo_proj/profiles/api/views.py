@@ -44,6 +44,18 @@ class ProfileViewSet(ModelViewSet):
     serializer_class = ProfileDetailSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_serializer_class(self):
+        if self.action == 'retrieve' or self.action == 'update':
+            return ProfileUpdateSerializer
+        return ProfileDetailSerializer
+
+    def list(self, request):
+        queryset = User.objects.all()
+        filter_backends = [DjangoFilterBackend, OrderingFilter]
+        filter_fields = ['user__email', 'user__first_name', 'user__last_name', 'birthdate', 'follows']
+        serializer = self.get_serializer_class()(queryset, many=True)
+        return Response(serializer.data)
+
     @detail_route(methods=['get', 'post'])
     def follow(self, request, pk=None):
         profile = self.get_object()
