@@ -1,60 +1,35 @@
-from rest_framework.generics import (
-    CreateAPIView,
-    RetrieveAPIView,
-    RetrieveUpdateAPIView,
-    DestroyAPIView,
-    ListAPIView,
-)
+from django.shortcuts import get_object_or_404
+
+
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import DjangoFilterBackend, OrderingFilter
 
 
 from profiles.models import Profile
+from .permissions import UserPermission
 from .serializers import (
     ProfileCreateSerializer,
     ProfileDetailSerializer,
     ProfileUpdateSerializer,
 )
-from .permissions import IsOwnerOrReadOnly, IsNotAuthenticated
-
-
-class ProfileCreateAPIView(CreateAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileCreateSerializer
-    permission_classes = [IsNotAuthenticated]
-
-
-class ProfileDetailEditAPIView(RetrieveUpdateAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileUpdateSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-
-
-class ProfileDeleteAPIView(DestroyAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileDetailSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
 
 class ProfileViewSet(ModelViewSet):
     queryset = Profile.objects.all()
-    serializer_class = ProfileDetailSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [UserPermission]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filter_fields = ['user__email', 'user__first_name', 'user__last_name', 'birthdate', 'follows']
 
     def get_serializer_class(self):
-        if self.action == 'retrieve' or self.action == 'update':
+        if self.action == 'create':
+            return ProfileCreateSerializer
+        if self.action == 'retrieve':
+            return ProfileDetailSerializer
+        if self.action == 'update':
             return ProfileUpdateSerializer
         return ProfileDetailSerializer
-
-    def list(self, request):
-        queryset = User.objects.all()
-        filter_backends = [DjangoFilterBackend, OrderingFilter]
-        filter_fields = ['user__email', 'user__first_name', 'user__last_name', 'birthdate', 'follows']
-        serializer = self.get_serializer_class()(queryset, many=True)
-        return Response(serializer.data)
 
     @detail_route(methods=['get', 'post'])
     def follow(self, request, pk=None):
@@ -101,11 +76,3 @@ class ProfileViewSet(ModelViewSet):
                 current_profile.save()
                 profile_data['status'] = 'You are no longer following this user.'
             return Response(profile_data)
-
-
-class ProfileListAPIView(ListAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileDetailSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filter_fields = ['user__email', 'user__first_name', 'user__last_name', 'birthdate', 'follows']

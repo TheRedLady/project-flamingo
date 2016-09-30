@@ -1,16 +1,22 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
-class IsOwnerOrReadOnly(BasePermission):
-
-    def has_object_permission(self, request, view, obj):
-        if request.method == 'GET':
-            return True
-        return obj.user == request.user or request.user.is_staff
-
-
-class IsNotAuthenticated(BasePermission):
-    message = "You must be logged out to create a new profile."
+class UserPermission(BasePermission):
 
     def has_permission(self, request, view):
-        return not request.user.is_authenticated() or request.user.is_staff
+        if request.method in SAFE_METHODS:
+            return request.user.is_authenticated() or view.action == 'list'
+        else:
+            if view.action == 'create':
+                return (not request.user.is_authenticated()) or request.user.is_staff
+            return request.user.is_authenticated() or view.action == 'list'
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:
+            return True
+        else:
+            if view.action == 'create' or view.action == 'list':
+                return (not request.user.is_authenticated()) or request.user.is_staff
+            elif view.action in ['follow', 'unfollow']:
+                return obj.user_id != request.user.id
+            return obj.user == request.user or request.user.is_staff
