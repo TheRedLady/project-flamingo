@@ -1,18 +1,18 @@
-from posts.models import Post, Tag, Like, Share
-from django.shortcuts import render
-
-from posts.models import Post, Like
+from posts.models import Post, Like, Tag
 from .serializers import (
     PostDetailSerializer,
     PostListSerializer,
     PostLikeSerializer,
+    PostShareSerializer,
+    PostTrendingSerializer
     )
 from .permissions import PostsPermissions
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 
 
 class PostAPIViewSet(ModelViewSet):
@@ -24,6 +24,10 @@ class PostAPIViewSet(ModelViewSet):
             return PostListSerializer
         elif self.action == 'like':
             return PostLikeSerializer
+        elif self.action == 'share':
+            return PostShareSerializer
+        elif self.action == 'trending':
+            return PostTrendingSerializer
         else:
             return PostDetailSerializer
 
@@ -34,7 +38,6 @@ class PostAPIViewSet(ModelViewSet):
                   permission_classes=[IsAuthenticated, ])
     def like(self, request, pk=None):
         post = self.get_object()
-        serializer = PostLikeSerializer(data=request.data)
 
         if request.method == 'GET':
             try:
@@ -57,8 +60,7 @@ class PostAPIViewSet(ModelViewSet):
             serializer = PostLikeSerializer(data=data)
 
             if serializer.is_valid():
-                print serializer.data.items()
-                serializer.save()
+                serializer.save(liked_by=request.user, post=post)
                 return Response({
                     'status': 'True',
                     'message': 'User {} likes post {}'.format(request.user, post.id)
@@ -80,13 +82,45 @@ class PostAPIViewSet(ModelViewSet):
 
     @detail_route(methods=['post'],
                   permission_classes=[IsAuthenticated, ])
-    def set_password(self, request, pk=None):
-        user = self.get_object()
-        serializer = PostLikeSerializer(data=request.data)
-        if serializer.is_valid():
-            user.set_password(serializer.data['password'])
-            user.save()
-            return Response({'status': 'password set'})
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+    def share(self, request, pk=None):
+        original_post = self.get_object()
+        shared_post = Post.objects.create(posted_by=request.user, content=original_post.content)
+        if request.method == 'POST':
+            data = {
+                'original_post': original_post,
+                'shared_post': shared_post,
+            }
+            serializer = PostShareSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save(original_post=original_post, shared_post=shared_post)
+                return Response({
+                    'status': 'True',
+                    'message': 'User {} shared post {}'.format(request.user, original_post.id)
+                    })
+            else:
+                return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
+
+    @list_route(permission_classes=[IsAuthenticated, ])
+    def trending(self, request):
+        trending = Tag.get_trending()
+
+        page = self.paginate_queryset(trending)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(trending, many=True)
+        return Response(serializer.data)
+
+
+class PostsByTagAPIView(ListAPIView):
+    serializer_class = PostListSerializer
+
+    def get_queryset(self):
+        tag = self.kwargs['tag']
+        requested_tag = Tag.objects.get(tag='#' + tag)
+        posts = Post.objects.filter(tag=requested_tag).order_by('-created')
+        Post.add_shared_property(posts)
+        posts = Post.add_liked_by_user(posts, self.request.user)
+        return posts

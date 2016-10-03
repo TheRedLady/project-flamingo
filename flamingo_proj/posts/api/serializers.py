@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField
-from posts.models import Post, Like, Share
+from posts.models import Post, Like, Share, Tag
 
 
 class PostDetailSerializer(ModelSerializer):
@@ -22,3 +22,16 @@ class PostLikeSerializer(ModelSerializer):
         model = Like
         fields = ['post', 'liked_by']
         read_only_fields = ['post', 'liked_by']
+
+
+class PostShareSerializer(ModelSerializer):
+    class Meta:
+        model = Share
+        fields = ['original_post', 'shared_post']
+        read_only_fields = ['original_post', 'shared_post']
+
+
+class PostTrendingSerializer(ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ['tag']

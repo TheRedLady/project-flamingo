@@ -7,4 +7,3 @@ from profiles.api.views import ProfileViewSet
 router = DefaultRouter()
 router.register(r'posts', PostAPIViewSet)
 router.register(r'profiles', ProfileViewSet)
-
