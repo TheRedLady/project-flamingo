@@ -16,8 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from posts.api.views import PostsByTagAPIView
-
-from .routers import router
+from home.api.views import PostsByFollowedAPIView
 
 from .routers import router
 
@@ -34,4 +33,5 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
     url(r'^api/posts/tag/(?P<tag>[a-zA-Z0-9]+)/$', PostsByTagAPIView.as_view(), name='posts-by-tag'),
+    url(r'^api/feed/$', PostsByFollowedAPIView.as_view(), name='feed'),
 ]
