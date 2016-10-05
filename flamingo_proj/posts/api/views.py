@@ -16,8 +16,15 @@ from rest_framework.generics import ListAPIView
 
 
 class PostAPIViewSet(ModelViewSet):
-    queryset = Post.objects.all()
+    # queryset = Post.objects.all()
     permission_classes = (PostsPermissions,)
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        posted_by = self.request.query_params.get('posted_by', None)
+        if posted_by is not None:
+            queryset = queryset.filter(posted_by=posted_by)
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'list':

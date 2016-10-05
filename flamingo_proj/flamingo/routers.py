@@ -5,5 +5,5 @@ from profiles.api.views import ProfileViewSet
 
 
 router = DefaultRouter()
-router.register(r'posts', PostAPIViewSet)
-router.register(r'profiles', ProfileViewSet)
+router.register(r'posts', PostAPIViewSet, base_name='post')
+router.register(r'profiles', ProfileViewSet, base_name='profile')
