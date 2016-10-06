@@ -1,3 +1,5 @@
+from home.utils import get_query, get_key
+
 from posts.models import Post, Like, Tag
 from .serializers import (
     PostDetailSerializer,
@@ -16,7 +18,6 @@ from rest_framework.generics import ListAPIView
 
 
 class PostAPIViewSet(ModelViewSet):
-    # queryset = Post.objects.all()
     permission_classes = (PostsPermissions,)
 
     def get_queryset(self):
@@ -130,4 +131,14 @@ class PostsByTagAPIView(ListAPIView):
         posts = Post.objects.filter(tag=requested_tag).order_by('-created')
         Post.add_shared_property(posts)
         posts = Post.add_liked_by_user(posts, self.request.user)
+        return posts
+
+
+class PostsSearchAPIView(ListAPIView):
+    serializer_class = PostListSerializer
+
+    def get_queryset(self):
+        q = self.kwargs['q']
+        posts_query = get_query(q, ['tag__tag'], tag=True)
+        posts = Post.objects.filter(posts_query)
         return posts

@@ -1,10 +1,10 @@
-from django.shortcuts import get_object_or_404
-
+from home.utils import get_query, get_key
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.filters import DjangoFilterBackend, OrderingFilter
+from rest_framework.generics import ListAPIView
 
 
 from profiles.models import Profile
@@ -76,3 +76,13 @@ class ProfileViewSet(ModelViewSet):
                 current_profile.save()
                 profile_data['status'] = 'You are no longer following this user.'
             return Response(profile_data)
+
+
+class ProfilesSearchAPIView(ListAPIView):
+    serializer_class = ProfileDetailSerializer
+
+    def get_queryset(self):
+        q = self.kwargs['q']
+        posts_query = get_query(q, ['user__first_name', 'user__last_name', ])
+        posts = Profile.objects.filter(posts_query)
+        return posts
