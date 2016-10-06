@@ -4,13 +4,23 @@
 {% block title %} {{ object }} | {{ block.super }} {% endblock title %}
 {% block content %}
     <div class="user-profile" id="userprofile{{object.user_id}}">
-    {% if user.id == object.user_id %} 
-        <h1> Me </h1>
-    {% else %} 
-        <h1> {{ object }} </h1>
-        {% include "message_form.html" %}
+
+    <p>Full name: <strong data-bind="text: fullName"></strong></p>
+        <form data-bind="submit: addPost">
+            Add post: <input data-bind="value: nextPostContent" placeholder="What are you thinking?" />
+            <button type="submit">Post</button>
+        </form>
+
+        <div data-bind="foreach: posts">
+            Posted by: <strong data-bind="text: $data.posted_by"></strong>
+            Date: <strong data-bind="text: $data.created"></strong>
+            <input data-bind="value: content" />
+            <a href="#" data-bind="click: $parent.removePost">Delete</a>
+            <br>
+        </div>
+
+
         {% include "follow_button.html" %}
-    {% endif %}
 
     {% if object.birthdate %}
         <p> Birthdate: {{ object.birthdate }} <br>
@@ -26,4 +36,5 @@
     <h2> Posts: </h2>
     {% include "display_posts.html" %}
     </div>
+    <script language="javascript" type="text/javascript" src="{% static 'profiles/js/profileKO.js' %}"></script>
 {% endblock content%}

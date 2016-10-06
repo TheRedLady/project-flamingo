@@ -29,7 +29,7 @@ class PostAPIViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return PostListSerializer
+            return PostDetailSerializer
         elif self.action == 'like':
             return PostLikeSerializer
         elif self.action == 'share':

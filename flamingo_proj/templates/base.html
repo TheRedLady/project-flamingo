@@ -32,12 +32,10 @@
             <h1><a href="{% url 'home' %}"> Flamingo Social Network </a></h1> 
         </div>
         {% include "messages_display.html" %}
+        <script language="javascript" type="text/javascript" src="{% static 'js/knockout-3.4.0.js' %}"></script>
         <div class="container" id="container">
-            <p>This is Knockout!: <strong data-bind="text: knockoutTest"></strong></p>
             {% block content %}{% endblock content %}
         </div>
     </div>
-    <script language="javascript" type="text/javascript" src="{% static 'js/knockout-3.4.0.js' %}"></script>
-    <script language="javascript" type="text/javascript" src="{% static 'js/testKO.js' %}"></script>
 </body>
 </html>
