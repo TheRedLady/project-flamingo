@@ -1,20 +1,24 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %} {{ object }} | {{ block.super }} {% endblock title %}
+{% block title %} {{ profile }} | {{ block.super }} {% endblock title %}
 {% block content %}
     <div class="user-profile" id="userprofile{{object.user_id}}">
 
-    <p>Full name: <strong data-bind="text: fullName"></strong></p>
+        <h2>{{ profile }}</h2>
         <form data-bind="submit: addPost">
             Add post: <input data-bind="value: nextPostContent" placeholder="What are you thinking?" />
-            <button type="submit">Post</button>
+            <button data-bind="click: addPost({{request.user.id}})">Post</button>
         </form>
 
         <hr>
-        <div data-bind="foreach: posts">
-            Posted by: <strong data-bind="text: $data.posted_by"></strong>
-            Date: <strong data-bind="text: $data.created"></strong>
+        <div id="post" data-bind="foreach: posts">
+            <strong>Posted by <a data-bind="attr: { href:$data.posted_by_url, html: $data.posted_by}, text: $data.posted_by_name"></a></strong>
+            <br>
+            <hr>
+            <strong>
+            <a data-bind="attr: { href: $data.post_url}, text: $data.created"></a>
+            </strong>
             <p data-bind="html: $data.content"></p>
             <button data-bind="click: $parent.removePost">Delete</button>
             <hr>

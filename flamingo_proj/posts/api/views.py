@@ -6,7 +6,8 @@ from .serializers import (
     PostListSerializer,
     PostLikeSerializer,
     PostShareSerializer,
-    PostTrendingSerializer
+    PostTrendingSerializer,
+    PostCreateSerializer
     )
 from .permissions import PostsPermissions
 from rest_framework.response import Response
@@ -30,6 +31,8 @@ class PostAPIViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return PostDetailSerializer
+        elif self.action == 'create':
+            return PostCreateSerializer
         elif self.action == 'like':
             return PostLikeSerializer
         elif self.action == 'share':
