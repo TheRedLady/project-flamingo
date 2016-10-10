@@ -18,6 +18,7 @@ from django.contrib import admin
 from posts.api.views import PostsByTagAPIView, PostsSearchAPIView
 from profiles.api.views import ProfilesSearchAPIView
 from home.api.views import PostsByFollowedAPIView
+from messaging.views import messaging
 
 from .routers import router
 
@@ -27,7 +28,7 @@ urlpatterns = [
     url(r'^', include('home.urls')),
     url(r'^api/', include(router.urls)),
     url(r'^profile/', include('profiles.urls', namespace='profiles')),
-    url(r'^messages/', include('messaging.urls', namespace='messages')),
+    url(r'^messaging/', messaging),
     url(r'^posts/', include('posts.urls', namespace='posts')),
     url(r'^ratings/', include('star_ratings.urls', namespace='ratings', app_name='ratings')),
     url(r'^admin/', admin.site.urls),

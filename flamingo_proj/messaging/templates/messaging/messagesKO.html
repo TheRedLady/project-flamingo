@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h1> Messages </h1>
+
+<ul class="folders" data-bind="foreach: folders">
+    <li data-bind="text: $data,
+                   css: { selected: $data == $root.chosenFolderId() },
+                   click: $root.goToFolder"></li>
+</ul>
+
+<table data-bind="with:chosenFolderData">
+    <thead>
+        <tr>
+            <th>From</th><th>To</th><th>Message</th><th>Date</th>
+        </tr>
+        <tbody data-bind="foreach: results">
+            <tr data-bind="click: $root.goToMail">
+                <td data-bind="text: sender"></td>
+                <td data-bind="text: recipient"></td>
+                <td data-bind="text: message_body"></td>
+                <td data-bind="text: sent_at"></td>
+            </tr>
+        </tbody>
+    </thead>
+</table>
+
+<div data-bind="with:chosenMailData">
+    From: <span data-bind="text: sender"> </span> <br>
+    To: <span data-bind="text: recipient"> </span>
+    <hr>
+    <p data-bind="html: message_body"></p>
+</div>
+
+<link rel="stylesheet" href="http://learn.knockoutjs.com/Content/TutorialSpecific/webmail.css" />
+<script language="javascript" type="text/javascript" src="{% static 'messaging/js/messagingKO.js' %}"></script>
+
+{% endblock content %}
