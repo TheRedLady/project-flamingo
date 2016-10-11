@@ -48,6 +48,7 @@ class Post(TimeStampedModel):
         for old in old_refs:
             old.posts.remove(self)
             old.save()
+        self.refresh_from_db()
 
     @staticmethod
     def add_shared_property(set_of_posts):
