@@ -13,14 +13,15 @@
 
         <hr>
         <div id="post" data-bind="foreach: posts">
-            <strong>Posted by <a data-bind="attr: { href:$data.posted_by_url, html: $data.posted_by}, text: $data.posted_by_name"></a></strong>
+            <strong> <span data-bind="text: $data.shared ? 'Shared by' : 'Posted by'"></span> <a data-bind="attr: { href:$data.posted_by.url, html: $data.posted_by}, text: $data.posted_by.full_name"></a></strong>
             <br>
             <hr>
             <strong>
-            <a data-bind="attr: { href: $data.post_url}, text: $data.created"></a>
+            <a data-bind="attr: { href: $data.url}, text: $data.created"></a>
             </strong>
             <p data-bind="html: $data.content"></p>
             <button data-bind="click: $parent.removePost">Delete</button>
+            <button data-bind="click: $parent.sharePost">Share</button>
             <hr>
             <br>
         </div>
