@@ -1,6 +1,8 @@
 from messaging.models import Message
 from .serializers import MessageDetailSerializer
 
+from django.utils import timezone
+
 from rest_framework.viewsets import ModelViewSet
 
 
@@ -24,3 +26,24 @@ class MessageViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
+
+    def perform_destroy(self, instance):
+        user_id = self.request.user.id
+
+        # If you are the recipient
+        if instance.recipient_id == user_id:
+            if instance.recipient_deleted_at is None:
+                instance.recipient_deleted_at = timezone.now()
+                instance.save()
+            else:
+                instance.recipient_deleted_perm = True
+                instance.save()
+
+        # If you are the sender
+        if instance.sender_id == user_id:
+            if instance.sender_deleted_at is None:
+                instance.sender_deleted_at = timezone.now()
+                instance.save()
+            else:
+                instance.sender_deleted_perm = True
+                instance.save()

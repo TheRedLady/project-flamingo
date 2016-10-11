@@ -11,17 +11,18 @@
                    click: $root.goToFolder"></li>
 </ul>
 
-<table data-bind="with:chosenFolderData">
+<table data-bind="with: chosenFolderData">
     <thead>
         <tr>
-            <th>From</th><th>To</th><th>Message</th><th>Date</th>
+            <th>From</th><th>To</th><th>Message</th><th>Date</th><th>Remove</th>
         </tr>
         <tbody data-bind="foreach: results">
-            <tr data-bind="click: $root.goToMail">
+            <tr>
                 <td data-bind="text: sender"></td>
                 <td data-bind="text: recipient"></td>
-                <td data-bind="text: message_body"></td>
+                <td data-bind="text: message_body, click: $root.goToMail"></td>
                 <td data-bind="text: sent_at"></td>
+                <td><a href="#" data-bind="click: $root.moveToTrash">Delete</a></td>
             </tr>
         </tbody>
     </thead>

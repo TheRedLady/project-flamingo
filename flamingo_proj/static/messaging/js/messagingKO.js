@@ -16,6 +16,14 @@ function MessagesViewModel() {
         $.get("/api/messaging/" + mail.id + "/", {}, self.chosenMailData);
     }
 
+    self.moveToTrash = function(mail) {
+        $.ajax({
+            url: "/api/messaging/" + mail.id + "/",
+            type: "delete"
+        });
+        self.goToFolder(self.chosenFolderId());
+    }
+
     self.goToFolder('Inbox');
 };
 

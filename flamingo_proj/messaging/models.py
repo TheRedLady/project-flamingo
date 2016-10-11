@@ -11,13 +11,18 @@ from django.utils import timezone
 class MessageManager(models.Manager):
 
     def inbox_for(self, user):
-        return self.filter(recipient=user, recipient_deleted_at__isnull=True)
+        return self.filter(recipient=user, recipient_deleted_at__isnull=True).order_by('-sent_at')
 
     def outbox_for(self, user):
-        return self.filter(sender=user, sender_deleted_at__isnull=True)
+        return self.filter(sender=user, sender_deleted_at__isnull=True).order_by('-sent_at')
 
     def trash_for(self, user):
-        return self.filter(recipient=user, recipient_deleted_at__isnull=False, recipient_deleted_perm=False) | self.filter(sender=user, sender_deleted_at__isnull=False, sender_deleted_perm=False)
+        return (self.filter(recipient=user,
+                            recipient_deleted_at__isnull=False,
+                            recipient_deleted_perm=False) | \
+                self.filter(sender=user,
+                            sender_deleted_at__isnull=False,
+                            sender_deleted_perm=False)).order_by('-sent_at')
 
     def not_seen_for(self, user):
         return self.filter(recipient=user, recipient_seen=False, recipient_deleted_at__isnull=True)

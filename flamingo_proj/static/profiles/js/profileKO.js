@@ -22,7 +22,6 @@ function Post(id, postedBy, content, created, posted_by_url, posted_by_name, pos
           type: "delete"
         });
     }
-
 }
 
 // This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
