@@ -11,12 +11,12 @@
                    click: $root.goToFolder"></li>
 </ul>
 
-<table data-bind="with: chosenFolderData">
+<table>
     <thead>
         <tr>
             <th>From</th><th>To</th><th>Message</th><th>Date</th><th>Remove</th>
         </tr>
-        <tbody data-bind="foreach: results">
+        <tbody data-bind="foreach: messages, visible: messages().length > 0">
             <tr>
                 <td data-bind="text: sender"></td>
                 <td data-bind="text: recipient"></td>
