@@ -27,7 +27,7 @@ function MessagesViewModel() {
 
     self.goToMail = function(mail) {
         self.chosenFolderData(null);
-        $.get("/api/messaging/" + mail.id + "/", {}, self.chosenMailData);
+        $.get("/api/messaging/" + mail.id() + "/", {}, self.chosenMailData);
     }
 
     self.moveToTrash = function(mail) {

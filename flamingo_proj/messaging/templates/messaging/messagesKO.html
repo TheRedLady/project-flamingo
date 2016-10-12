@@ -11,7 +11,15 @@
                    click: $root.goToFolder"></li>
 </ul>
 
-<table>
+
+<div data-bind="with:chosenMailData">
+    From: <span data-bind="text: sender"> </span> <br>
+    To: <span data-bind="text: recipient"> </span>
+    <hr>
+    <p data-bind="html: message_body"></p>
+</div>
+
+<table class="mails">
     <thead>
         <tr>
             <th>From</th><th>To</th><th>Message</th><th>Date</th><th>Remove</th>
@@ -28,14 +36,6 @@
     </thead>
 </table>
 
-<div data-bind="with:chosenMailData">
-    From: <span data-bind="text: sender"> </span> <br>
-    To: <span data-bind="text: recipient"> </span>
-    <hr>
-    <p data-bind="html: message_body"></p>
-</div>
-
-<link rel="stylesheet" href="http://learn.knockoutjs.com/Content/TutorialSpecific/webmail.css" />
 <script language="javascript" type="text/javascript" src="{% static 'messaging/js/messagingKO.js' %}"></script>
 
 {% endblock content %}

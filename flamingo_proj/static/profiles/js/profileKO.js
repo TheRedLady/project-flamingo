@@ -27,8 +27,8 @@ function Post(id, postedBy, content, created, posted_by_url, posted_by_name, pos
 // This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
 function ProfileViewModel() {
     var self = this;
-    self.firstName = ko.observable("Bert");
-    self.lastName = ko.observable("Bertington");
+    self.firstName = ko.observable();
+    self.lastName = ko.observable();
     self.posts = ko.observableArray([]);
     self.nextPostContent = ko.observable("");
 
@@ -58,10 +58,22 @@ function ProfileViewModel() {
         });
         self.nextPostContent("");
     };
+
     self.removePost = function(post) { 
       self.posts.remove(post);
       post.removePost();
     };
+
+    self.likePost = function(post) {
+        $.ajax({
+            url: "/api/posts/" + post.post_id + "/like/",
+            method: "GET"
+        }).done(function (results) {
+            if (results['status'] === 'True') {
+
+            }
+        });
+    }
 }
 
 // Activates knockout.js

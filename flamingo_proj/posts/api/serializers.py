@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField, SerializerMethodField, DateTimeField
+from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField, SerializerMethodField
 from posts.models import Post, Like, Share, Tag
 
 
