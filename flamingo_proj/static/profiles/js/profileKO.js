@@ -69,11 +69,9 @@ function ProfileViewModel() {
             url: "/api/posts/" + post.post_id + "/like/",
             method: "GET"
         }).done(function (results) {
-            if (results['status'] === 'True') {
-
-            }
-        });
-    }
+            console.log(results);
+            });
+        };
 }
 
 // Activates knockout.js
