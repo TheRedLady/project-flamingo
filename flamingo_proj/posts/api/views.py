@@ -125,18 +125,6 @@ class PostAPIViewSet(ModelViewSet):
         return Response(serializer.data)
 
 
-class PostsByTagAPIView(ListAPIView):
-    serializer_class = PostListSerializer
-
-    def get_queryset(self):
-        tag = self.kwargs['tag']
-        requested_tag = Tag.objects.get(tag='#' + tag)
-        posts = Post.objects.filter(tag=requested_tag).order_by('-created')
-        Post.add_shared_property(posts)
-        posts = Post.add_liked_by_user(posts, self.request.user)
-        return posts
-
-
 class PostsSearchAPIView(ListAPIView):
     serializer_class = PostListSerializer
 

@@ -59,7 +59,7 @@ def search(request):
         posts_result.extend(posts)
         profiles_result.extend(users)
         results = sorted(chain(users, posts), key=lambda instance: get_key(instance), reverse=True)
-    return render(request, 'home/search.html',
+    return render(request, 'home/searchKO.html',
                   context={
                       'posts': posts_result,
                       'posts_count': len(posts_result),

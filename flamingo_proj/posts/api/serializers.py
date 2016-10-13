@@ -39,7 +39,7 @@ class PostListSerializer(ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['detail_url', 'id', 'posted_by', 'content']
+        fields = ['detail_url', 'posted_by', 'content', 'created']
 
 
 class PostLikeSerializer(ModelSerializer):

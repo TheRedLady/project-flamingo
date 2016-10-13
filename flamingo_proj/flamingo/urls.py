@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from posts.api.views import PostsByTagAPIView, PostsSearchAPIView
+from posts.api.views import PostsSearchAPIView
 from profiles.api.views import ProfilesSearchAPIView
 from home.api.views import PostsByFollowedAPIView
 from messaging.views import messaging
@@ -35,7 +35,6 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
     url(r'^api/feed/$', PostsByFollowedAPIView.as_view(), name='feed'),
-    url(r'^api/posts/tag/(?P<tag>[a-zA-Z0-9]+)/$', PostsByTagAPIView.as_view(), name='posts-by-tag'),
     url(r'^api/posts/search/(?P<q>[a-zA-Z0-9]+)/$', PostsSearchAPIView.as_view(), name='search'),
     url(r'^api/profiles/search/(?P<q>[a-zA-Z0-9]+)/$', ProfilesSearchAPIView.as_view(), name='search')
 ]

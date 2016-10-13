@@ -83,7 +83,7 @@ class ProfileDetailSerializer(ModelSerializer):
 
     user = MyUserDetailSerializer(read_only=True)
     follows = FollowSerializer(read_only=True, many=True)
-    url = HyperlinkedIdentityField(view_name = 'profile-detail')
+    url = HyperlinkedIdentityField(view_name='profile-detail')
 
     class Meta:
         model = Profile

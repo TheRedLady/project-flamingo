@@ -17,7 +17,6 @@ function MessagesViewModel() {
     self.goToFolder = function(folder) {
         self.chosenFolderId(folder);
         self.chosenMailData(null);
-//        $.get('/api/messaging', { folder: folder }, self.chosenFolderData);
         $.getJSON('/api/messaging', { folder: folder }, function(allData) {
         console.log(allData['results']);
         var mappedMails = $.map(allData['results'], function(item) { return new Message(item) });
