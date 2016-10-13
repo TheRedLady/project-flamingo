@@ -31,7 +31,7 @@ def messages_main(request):
 
 @login_required
 def message_check(request):
-    temp = temp = Message.objects.not_seen_for(request.user)
+    temp = Message.objects.not_seen_for(request.user)
     json_val_list = temp.values_list('id', 'message_body').order_by('-sent_at')
     new_messages = json.dumps(list(json_val_list), cls=DjangoJSONEncoder)
     for message in temp:
@@ -124,3 +124,6 @@ def delete_message(request, message_id):
     else:
         raise Http404("You cannot delete this message!")
 
+
+def messaging(request):
+    return render(request, 'messaging/messagesKO.html', context={})

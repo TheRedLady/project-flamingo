@@ -1,5 +1,9 @@
-from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField, SerializerMethodField, DateTimeField
-from django.urls import reverse
+from rest_framework.serializers import (
+    ModelSerializer,
+    HyperlinkedIdentityField,
+    SerializerMethodField,
+    DateTimeField
+)
 
 from posts.models import Post, Like, Share, Tag
 from profiles.api.serializers import PostedBySerializer
@@ -10,6 +14,7 @@ class PostDetailSerializer(ModelSerializer):
     url = HyperlinkedIdentityField(view_name='posts:detail')
     created = DateTimeField(format="%b %-d, %Y, %H:%M", read_only=True)
     modified = DateTimeField(format="%b %-d, %Y, %H:%M", read_only=True)
+
     class Meta:
         model = Post
         fields = '__all__'
@@ -20,6 +25,7 @@ class PostCreateSerializer(ModelSerializer):
     class Meta:
         model = Post
         fields = ['content']
+        read_only_fields = ['posted_by']
 
 
 class PostListSerializer(ModelSerializer):

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h1> Messages </h1>
+
+<ul class="folders" data-bind="foreach: folders">
+    <li data-bind="text: $data,
+                   css: { selected: $data == $root.chosenFolderId() },
+                   click: $root.goToFolder"></li>
+</ul>
+
+
+<div data-bind="with:chosenMailData">
+    From: <span data-bind="text: sender"> </span> <br>
+    To: <span data-bind="text: recipient"> </span>
+    <hr>
+    <p data-bind="html: message_body"></p>
+</div>
+
+<table class="mails">
+    <thead>
+        <tr>
+            <th>From</th><th>To</th><th>Message</th><th>Date</th><th>Remove</th>
+        </tr>
+        <tbody data-bind="foreach: messages, visible: messages().length > 0">
+            <tr>
+                <td data-bind="text: sender"></td>
+                <td data-bind="text: recipient"></td>
+                <td data-bind="text: message_body, click: $root.goToMail"></td>
+                <td data-bind="text: sent_at"></td>
+                <td><a href="#" data-bind="click: $root.moveToTrash">Delete</a></td>
+            </tr>
+        </tbody>
+    </thead>
+</table>
+
+<script language="javascript" type="text/javascript" src="{% static 'messaging/js/messagingKO.js' %}"></script>
+
+{% endblock content %}

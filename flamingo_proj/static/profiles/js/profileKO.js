@@ -20,7 +20,6 @@ function Post(id, url, postedBy, content, created, shared) {
           type: "delete"
         });
     }
-
 }
 
 // This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
@@ -63,6 +62,15 @@ function ProfileViewModel() {
       self.posts.remove(post);
       post.removePost();
     };
+
+    self.likePost = function(post) {
+        $.ajax({
+            url: "/api/posts/" + post.post_id + "/like/",
+            method: "GET"
+        }).done(function (results) {
+            console.log(results);
+            });
+        };
 }
 
 // Activates knockout.js
