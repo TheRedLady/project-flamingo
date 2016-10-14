@@ -98,6 +98,8 @@ class Tag(models.Model):
         latest_posts = Post.get_latest()
         tags_found = [tag for post in latest_posts for tag in post.tag_set.all()]
         tag_counts = Counter(tags_found).most_common(5)
+        for t in tag_counts:
+            t[0].occurrences_count = t[1]
         return [t[0] for t in tag_counts]
 
     def __str__(self):

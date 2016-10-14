@@ -31,7 +31,6 @@ class PostDetailSerializer(ModelSerializer):
         return obj.likes.count()
 
 
-
 class PostCreateSerializer(ModelSerializer):
     class Meta:
         model = Post
@@ -60,6 +59,7 @@ class PostLikeSerializer(ModelSerializer):
 
 class PostShareSerializer(ModelSerializer):
     url = HyperlinkedIdentityField(view_name='post-detail')
+
     class Meta:
         model = Post
         fields = ['id', 'url']
@@ -68,6 +68,7 @@ class PostShareSerializer(ModelSerializer):
 class ShareSerializer(ModelSerializer):
     original_post = PostShareSerializer()
     shared_post = PostShareSerializer()
+
     class Meta:
         model = Share
         fields = ['original_post', 'shared_post']
@@ -75,6 +76,15 @@ class ShareSerializer(ModelSerializer):
 
 
 class PostTrendingSerializer(ModelSerializer):
+    tag_occurrences_count = SerializerMethodField()
+    tag_clean = SerializerMethodField()
+
+    def get_tag_occurrences_count(self, obj):
+        return obj.occurrences_count
+
+    def get_tag_clean(self, obj):
+        return obj.tag[1:]
+
     class Meta:
         model = Tag
-        fields = ['tag']
+        fields = ['tag_clean', 'tag_occurrences_count']

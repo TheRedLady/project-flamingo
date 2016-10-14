@@ -1,10 +1,24 @@
-{% extends 'base.html' %}
-{% block content %}
-<h1>Trending tags in latest posts:</h1>
+{% extends "base.html" %}
+{% load static %}
 
-<ul>
-{% for tag in trending %}
-    <li id="tag{{ tag.id }}"> <a href="{{ tag.get_absolute_url }}">{{ tag }}</a> - Found in {{ tag.get_occurrences}} posts </li>
-{% endfor %}
-</ul>
+{% block content %}
+
+<h1> Trending </h1>
+
+<table class="mails">
+    <thead>
+        <tr>
+            <th>Tag</th><th>Occurrences Count</th>
+        </tr>
+        <tbody data-bind="foreach: tags">
+            <tr data-bind="click: goToTag">
+                <td data-bind="text: tag"></td>
+                <td data-bind="text: occurrences_count"></td>
+            </tr>
+        </tbody>
+    </thead>
+</table>
+
+<script language="javascript" type="text/javascript" src="{% static 'posts/js/trendingKO.js' %}"></script>
+
 {% endblock content %}
