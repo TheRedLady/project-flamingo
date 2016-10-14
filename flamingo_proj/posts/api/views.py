@@ -23,7 +23,7 @@ class PostAPIViewSet(ModelViewSet):
     permission_classes = (PostsPermissions,)
 
     def get_queryset(self):
-        queryset = Post.objects.all()
+        queryset = Post.objects.all().order_by('-created')
         posted_by = self.request.query_params.get('posted_by', None)
         if posted_by is not None:
             queryset = queryset.filter(posted_by=posted_by)
@@ -59,12 +59,14 @@ class PostAPIViewSet(ModelViewSet):
                 Like.objects.get(liked_by=request.user, post=post)
                 return Response({
                     'status': 'True',
-                    'message': 'User {} likes post {}'.format(request.user, post.id)
+                    'message': 'User {} likes post {}'.format(request.user, post.id),
+                    'liked': True,
                 })
             except Like.DoesNotExist:
                 return Response({
                     'status': 'False',
-                    'message': "User {} doesn't currently like post {}".format(request.user, post.id)
+                    'message': "User {} doesn't currently like post {}".format(request.user, post.id),
+                    'liked': False,
                 })
 
         elif request.method == 'POST':
@@ -78,7 +80,8 @@ class PostAPIViewSet(ModelViewSet):
                 serializer.save(liked_by=request.user, post=post)
                 return Response({
                     'status': 'True',
-                    'message': 'User {} likes post {}'.format(request.user, post.id)
+                    'message': 'User {} likes post {}'.format(request.user, post.id),
+                    'liked': True,
                     })
             else:
                 return Response(serializer.errors,
@@ -89,7 +92,8 @@ class PostAPIViewSet(ModelViewSet):
             print "DELETED ", deleted
             return Response({
                 'status': 'True',
-                'message': "User {} unliked like post {}".format(request.user, post.id)
+                'message': "User {} unliked like post {}".format(request.user, post.id),
+                'liked': False,
                 })
         else:
             return Response({'status': 'False',

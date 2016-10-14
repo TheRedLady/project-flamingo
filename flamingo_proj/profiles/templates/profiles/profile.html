@@ -6,14 +6,34 @@
     <div class="user-profile" id="userprofile{{object.user_id}}">
 
         <h2>{{ profile }}</h2>
+
+        {% if object.birthdate %}
+        <p> Birthdate: {{ object.birthdate }}
+        {% endif %}
+       {% if object.user_id == user.id %}
         <form data-bind="submit: addPost">
             Add post: <input data-bind="value: nextPostContent" placeholder="What are you thinking?" />
             <button data-bind="click: addPost({{request.user.id}})">Post</button>
         </form>
+        {% else %}
+        <br>
+        <button id="follow-button" data-bind="click: follow, text: following() ? 'Unfollow' : 'Follow'"></button>
+        <br>
+        {% endif %}
+
+        <br>
+        {% load ratings %}
+        {% ratings object %}
+        <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
+        <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
 
         <hr>
         <div id="post" data-bind="foreach: posts">
-            <strong> <span data-bind="text: $data.shared ? 'Shared by' : 'Posted by'"></span> <a data-bind="attr: { href:$data.posted_by.url, html: $data.posted_by}, text: $data.posted_by.full_name"></a></strong>
+            <strong> <span data-bind="text: $data.is_shared ? 'Shared by' : 'Posted by'"></span> <a data-bind="attr: { href:$data.posted_by.url}, text: $data.posted_by.full_name"></a></strong>
+            <span data-bind="if: $data.is_shared">
+            <br>
+              <strong><a data-bind="attr: {href: $data.share.original_post}, text: 'Original post'"></a></strong>
+            </span>
             <br>
             <hr>
             <strong>
@@ -22,27 +42,12 @@
             <p data-bind="html: $data.content"></p>
             <button data-bind="click: $parent.removePost">Delete</button>
             <button data-bind="click: $parent.sharePost">Share</button>
-            <button data-bind="click: $parent.likePost">Like</button>
+            <small id="like-count" data-bind="text: likes() + ' people like this'"></small>
+            <button data-bind="click: likeUnlike, text: liked() ? 'Unlike' : 'Like'">Like</button>
             <hr>
             <br>
         </div>
-
-
-        {% include "follow_button.html" %}
-
-    {% if object.birthdate %}
-        <p> Birthdate: {{ object.birthdate }} <br>
-    {% endif %}
-    {% load ratings %}
-    {% ratings object %}
-    <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
-    <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
-        {% if object.user_id == user.id %}
-        {% include "create_post_form.html" %}
-        {% endif %}
         <br>
-    <h2> Posts: </h2>
-    {% include "display_posts.html" %}
     </div>
     <script language="javascript" type="text/javascript" src="{% static 'profiles/js/profileKO.js' %}"></script>
 {% endblock content%}

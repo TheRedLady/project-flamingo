@@ -12,13 +12,26 @@ from profiles.api.serializers import PostedBySerializer
 class PostDetailSerializer(ModelSerializer):
     posted_by = PostedBySerializer(read_only=True)
     url = HyperlinkedIdentityField(view_name='posts:detail')
-    created = DateTimeField(format="%b %-d, %Y, %H:%M", read_only=True)
-    modified = DateTimeField(format="%b %-d, %Y, %H:%M", read_only=True)
+    share = SerializerMethodField()
+    like_count = SerializerMethodField()
 
     class Meta:
         model = Post
         fields = '__all__'
         read_only_fields = ['content']
+
+    def get_share(self, obj):
+        try:
+            share = Share.objects.get(shared_post_id=obj.id)
+            data = {'original_post_id': share.original_post.id,
+                    'original_post': share.original_post.get_absolute_url()}
+            return data
+        except Share.DoesNotExist:
+            return None
+
+    def get_like_count(self, obj):
+        return obj.likes.count()
+
 
 
 class PostCreateSerializer(ModelSerializer):
