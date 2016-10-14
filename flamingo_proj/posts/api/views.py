@@ -136,6 +136,21 @@ class PostAPIViewSet(ModelViewSet):
         serializer = self.get_serializer(trending, many=True)
         return Response(serializer.data)
 
+    @list_route(permission_classes=[IsAuthenticated, ])
+    def feed(self, request):
+        logged_user = request.user
+        posts = Post.objects.filter(posted_by__in=
+                                    [fol.user.id for fol in logged_user.profile.follows.all()]).order_by('-created')
+        posts = Post.add_liked_by_user(posts, request.user)
+        Post.add_shared_property(posts)
+        page = self.paginate_queryset(posts)
+        if page is not None:
+            serializer = self.get_serializer(posts, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data)
+
 
 class PostsSearchAPIView(ListAPIView):
     serializer_class = PostListSerializer
