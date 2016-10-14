@@ -39,10 +39,14 @@ class PostCreateSerializer(ModelSerializer):
 
 class PostListSerializer(ModelSerializer):
     detail_url = HyperlinkedIdentityField(view_name='post-detail')
+    posted_by_name = SerializerMethodField()
+
+    def get_posted_by_name(self, obj):
+        return obj.posted_by.get_full_name()
 
     class Meta:
         model = Post
-        fields = ['detail_url','id', 'posted_by', 'content', 'created']
+        fields = ['posted_by_name', 'detail_url', 'id', 'posted_by', 'content', 'created']
 
 
 class PostLikeSerializer(ModelSerializer):
