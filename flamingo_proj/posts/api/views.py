@@ -1,13 +1,14 @@
 from home.utils import get_query, get_key
 
-from posts.models import Post, Like, Tag
+from posts.models import Post, Like, Tag, Share
 from .serializers import (
     PostDetailSerializer,
     PostListSerializer,
     PostLikeSerializer,
     PostShareSerializer,
     PostTrendingSerializer,
-    PostCreateSerializer
+    PostCreateSerializer,
+    ShareSerializer,
     )
 from .permissions import PostsPermissions
 from rest_framework.response import Response
@@ -22,7 +23,7 @@ class PostAPIViewSet(ModelViewSet):
     permission_classes = (PostsPermissions,)
 
     def get_queryset(self):
-        queryset = Post.objects.all()
+        queryset = Post.objects.all().order_by('-created')
         posted_by = self.request.query_params.get('posted_by', None)
         if posted_by is not None:
             queryset = queryset.filter(posted_by=posted_by)
@@ -31,7 +32,7 @@ class PostAPIViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return PostDetailSerializer
-        elif self.action == 'create':
+        elif self.action == 'create' or self.action == 'update':
             return PostCreateSerializer
         elif self.action == 'like':
             return PostLikeSerializer
@@ -42,8 +43,11 @@ class PostAPIViewSet(ModelViewSet):
         else:
             return PostDetailSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(posted_by=self.request.user)
+    def create(self, request):
+        new_post = Post.objects.create(posted_by=self.request.user,
+                                       content=request.data['content'])
+        serializer = PostDetailSerializer(new_post, context={'request': request})
+        return Response(serializer.data)
 
     @detail_route(methods=['get', 'post', 'delete'],
                   permission_classes=[IsAuthenticated, ])
@@ -55,12 +59,14 @@ class PostAPIViewSet(ModelViewSet):
                 Like.objects.get(liked_by=request.user, post=post)
                 return Response({
                     'status': 'True',
-                    'message': 'User {} likes post {}'.format(request.user, post.id)
+                    'message': 'User {} likes post {}'.format(request.user, post.id),
+                    'liked': True,
                 })
             except Like.DoesNotExist:
                 return Response({
                     'status': 'False',
-                    'message': "User {} doesn't currently like post {}".format(request.user, post.id)
+                    'message': "User {} doesn't currently like post {}".format(request.user, post.id),
+                    'liked': False,
                 })
 
         elif request.method == 'POST':
@@ -74,7 +80,8 @@ class PostAPIViewSet(ModelViewSet):
                 serializer.save(liked_by=request.user, post=post)
                 return Response({
                     'status': 'True',
-                    'message': 'User {} likes post {}'.format(request.user, post.id)
+                    'message': 'User {} likes post {}'.format(request.user, post.id),
+                    'liked': True,
                     })
             else:
                 return Response(serializer.errors,
@@ -85,29 +92,34 @@ class PostAPIViewSet(ModelViewSet):
             print "DELETED ", deleted
             return Response({
                 'status': 'True',
-                'message': "User {} unliked like post {}".format(request.user, post.id)
+                'message': "User {} unliked like post {}".format(request.user, post.id),
+                'liked': False,
                 })
         else:
             return Response({'status': 'False',
                              'error': 'Something went wrong with the like'})
 
-    @detail_route(methods=['post'],
+    @detail_route(methods=['get', 'post'],
                   permission_classes=[IsAuthenticated, ])
     def share(self, request, pk=None):
         original_post = self.get_object()
-        shared_post = Post.objects.create(posted_by=request.user, content=original_post.content)
+        if request.method == 'GET':
+            serializer = PostDetailSerializer(original_post, context={'request': request})
+            shares = Share.objects.filter(original_post=original_post)
+            serializer = ShareSerializer(shares, many=True, context={'request': request})
+            return Response(serializer.data)
         if request.method == 'POST':
+            shared_post = Post.objects.create(posted_by=request.user,
+                                              content=original_post.content)
+            share = Share.objects.create(original_post=original_post, shared_post=shared_post)
             data = {
-                'original_post': original_post,
-                'shared_post': shared_post,
+                'original_post': PostShareSerializer(original_post, context={'request': request}).data,
+                'shared_post': PostShareSerializer(shared_post, context={'request': request}).data,
             }
-            serializer = PostShareSerializer(data=data)
+            serializer = ShareSerializer(data=data)
             if serializer.is_valid():
-                serializer.save(original_post=original_post, shared_post=shared_post)
-                return Response({
-                    'status': 'True',
-                    'message': 'User {} shared post {}'.format(request.user, original_post.id)
-                    })
+                serializer = PostDetailSerializer(shared_post, context={'request': request})
+                return Response(serializer.data)
             else:
                 return Response(serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)

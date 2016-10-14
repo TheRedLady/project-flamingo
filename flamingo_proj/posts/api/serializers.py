@@ -2,39 +2,41 @@ from rest_framework.serializers import (ModelSerializer,
                                         HyperlinkedIdentityField,
                                         SerializerMethodField,
                                         DateTimeField)
+
 from posts.models import Post, Like, Share, Tag
+from profiles.api.serializers import PostedBySerializer
 
 
 class PostDetailSerializer(ModelSerializer):
-    posted_by_url = SerializerMethodField()
-    posted_by_name = SerializerMethodField()
-    post_url = HyperlinkedIdentityField(view_name='posts:detail')
-    # created = DateTimeField(format="%b %-d, %Y, %H:%M")
-
-    def get_posted_by_url(self, obj):
-        return obj.posted_by.get_absolute_url()
-
-    def get_posted_by_name(self, obj):
-        return obj.posted_by.get_full_name()
+    posted_by = PostedBySerializer(read_only=True)
+    url = HyperlinkedIdentityField(view_name='posts:detail')
+    share = SerializerMethodField()
+    like_count = SerializerMethodField()
 
     class Meta:
         model = Post
         fields = '__all__'
-        read_only_fields = ['posted_by', 'id', 'posted_by_url', 'post_url']
+        read_only_fields = ['content']
+
+    def get_share(self, obj):
+        try:
+            share = Share.objects.get(shared_post_id=obj.id)
+            data = {'original_post_id': share.original_post.id,
+                    'original_post': share.original_post.get_absolute_url()}
+            return data
+        except Share.DoesNotExist:
+            return None
+
+    def get_like_count(self, obj):
+        return obj.likes.count()
+
 
 
 class PostCreateSerializer(ModelSerializer):
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['content']
         read_only_fields = ['posted_by']
-
-    def create(self, validated_data):
-        post = Post(posted_by=validated_data['posted_by'], content=validated_data['content'])
-        post.save()
-        post.create_hashtags()
-        post.save()
-        return post
 
 
 class PostListSerializer(ModelSerializer):
@@ -57,6 +59,15 @@ class PostLikeSerializer(ModelSerializer):
 
 
 class PostShareSerializer(ModelSerializer):
+    url = HyperlinkedIdentityField(view_name='post-detail')
+    class Meta:
+        model = Post
+        fields = ['id', 'url']
+
+
+class ShareSerializer(ModelSerializer):
+    original_post = PostShareSerializer()
+    shared_post = PostShareSerializer()
     class Meta:
         model = Share
         fields = ['original_post', 'shared_post']
