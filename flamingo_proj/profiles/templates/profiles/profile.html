@@ -40,7 +40,7 @@
             <a data-bind="attr: { href: $data.url}, text: $data.created"></a>
             </strong>
             <p data-bind="html: $data.content"></p>
-            <button data-bind="click: $parent.removePost">Delete</button>
+            <button data-bind="click: $parent.removePost, visible: {{ request.user.id }} == posted_by.id">Delete</button>
             <button data-bind="click: $parent.sharePost">Share</button>
             <small id="like-count" data-bind="text: likes() + ' people like this'"></small>
             <button data-bind="click: likeUnlike, text: liked() ? 'Unlike' : 'Like'">Like</button>

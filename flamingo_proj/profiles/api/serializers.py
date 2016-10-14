@@ -126,7 +126,7 @@ class ProfileUpdateSerializer(ModelSerializer):
 
 class PostedBySerializer(ModelSerializer):
 
-    url = HyperlinkedIdentityField(view_name='profile-detail')
+    url = SerializerMethodField()
     full_name = SerializerMethodField()
 
     class Meta:
@@ -140,3 +140,6 @@ class PostedBySerializer(ModelSerializer):
 
     def get_full_name(self, obj):
         return obj.get_full_name()
+
+    def get_url(self, obj):
+        return obj.get_absolute_url()
