@@ -22,7 +22,7 @@
             <th>Posted By</th><th>Post</th><th>Date</th>
         </tr>
         <tbody data-bind="foreach: postResults">
-            <tr>
+            <tr data-bind="click: goToPost">
                 <td data-bind="text: posted_by"></td>
                 <td data-bind="text: content"></td>
                 <td data-bind="text: date"></td>
@@ -31,13 +31,13 @@
     </thead>
 </table>
 
-<table class="mails" data-bind="ifnot: postTabSelected">
+<table class="mails" data-bind="if: profileTabSelected">
     <thead>
         <tr>
             <th>Profile</th><th>E-mail</th>
         </tr>
         <tbody data-bind="foreach: profileResults">
-            <tr>
+            <tr data-bind="click: goToProfile">
                 <td data-bind="text: fullName"></td>
                 <td data-bind="text: email"></td>
             </tr>

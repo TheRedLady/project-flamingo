@@ -1,4 +1,7 @@
-from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField, SerializerMethodField
+from rest_framework.serializers import (ModelSerializer,
+                                        HyperlinkedIdentityField,
+                                        SerializerMethodField,
+                                        DateTimeField)
 from posts.models import Post, Like, Share, Tag
 
 
@@ -39,7 +42,7 @@ class PostListSerializer(ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['detail_url', 'posted_by', 'content', 'created']
+        fields = ['detail_url','id', 'posted_by', 'content', 'created']
 
 
 class PostLikeSerializer(ModelSerializer):
