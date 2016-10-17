@@ -1,12 +1,8 @@
 {% extends "base.html" %}
+{% load static %}
 
 
 {% block content %}
-<script type="text/javascript">
-    $(document).ready(function(){
-        auto_refresh();
-    });
-</script>
 
 <h1> You are at the feed page! </h1>
 <p> You are now logged in as {{ user_name }} </p>
@@ -16,4 +12,8 @@
 <h2> Posts by people you are following: </h2>
 {% include "display_posts.html" %}
 
+    <script language="javascript" type="text/javascript" src="{% static 'profiles/js/profileKO.js' %}"></script>
+    <script language="javascript" type="text/javascript">
+      ko.applyBindings(new Feed("/api/posts/feed/"));
+    </script>
 {% endblock content %}

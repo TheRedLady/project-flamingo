@@ -1,17 +1,19 @@
 // Class to represent a row in the seat reservations grid
 //
+//
+
 makePost = function(data) {
   return new Post(data['id'], data['url'], data['posted_by'], data['content'],
-                  data['created'], data['share'], data['like_count']);
+                  data['created'], data['share'], data['like_count'], data['liked']);
 }
 
-getProfile = function () {
+getId = function () {
     var loc = String(window.location).split("/");
-    var profile_id = loc[loc.length - 2];
-    return profile_id;
+    var id = loc[loc.length - 2];
+    return id;
 }
 
-function Post(id, url, postedBy, content, created, share, likes) {
+function Post(id, url, postedBy, content, created, share, likes, liked) {
     var self = this;
     self.id = id;
     self.url = url;
@@ -19,7 +21,7 @@ function Post(id, url, postedBy, content, created, share, likes) {
     self.content = content;
     self.created = created;
     self.likes = ko.observable(likes);
-    self.liked = ko.observable();
+    self.liked = ko.observable(liked);
 
     self.likeUnlike = function() {
       url = "/api/posts/" + self.id + "/like/";
@@ -35,22 +37,10 @@ function Post(id, url, postedBy, content, created, share, likes) {
         url: url,
         method: method
       }).done(function(data) {
-        console.log(data);
         self.liked(data['liked']);  
       });
-      };
+    };
 
-    self.likeStatus = function () {
-      $.ajax({
-        url: "/api/posts/" + self.id + "/like/",
-        method: "GET"
-      }).done(function (data) {
-        self.liked(data['liked']);
-      });
-    }
-
-    self.likeStatus();
-     
     if (share == null) {
       self.is_shared = false;
       self.share = null;
@@ -68,12 +58,13 @@ function Post(id, url, postedBy, content, created, share, likes) {
     }
 }
 
+
 // This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
 function ProfileViewModel() {
     var self = this;
     self.posts = ko.observableArray([]);
     self.nextPostContent = ko.observable("");
-    self.current_profile = getProfile();
+    self.current_profile = getId();
     self.following = ko.observable();
   
    var posts_by_user = "/api/posts/?posted_by=" + self.current_profile;
@@ -145,13 +136,45 @@ function ProfileViewModel() {
         url: url,
         method: "POST",
       }).done(function (data) {
-        console.log(data['following']);
         self.following(data['following']);
       });
     };
-
-
 }
 
-// Activates knockout.js
-ko.applyBindings(new ProfileViewModel());
+
+function Feed(url) {
+  var self = this;
+  self.posts = ko.observableArray([]);
+  self.nextPostContent = ko.observable("");
+
+  self.loopPages = function(url) {
+    $.getJSON(url, function(data) {
+      var new_posts = $.map(data['results'], function(post) { return makePost(post); })
+      for(let i = 0; i < new_posts.length; i++){
+        self.posts.push(new_posts[i]);
+      }
+      if(data['next'] != null){
+        self.loopPages(data['next']);
+      }
+    });
+  };
+  
+  self.loopPages(url);
+
+  self.addPost = function(user_id) {
+    $.ajax("/api/posts/",
+        {
+          data: { posted_by: user_id, content: self.nextPostContent()},
+          type: "post"
+        });    
+    self.nextPostContent("");
+  };
+
+  self.sharePost = function(post) {
+      $.ajax({
+        url: "/api/posts/" + post.id + "/share/",
+        type: "post"
+      });
+  };
+
+}

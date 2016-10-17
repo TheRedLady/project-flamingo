@@ -11,11 +11,8 @@
         <p> Birthdate: {{ object.birthdate }}
         {% endif %}
        {% if object.user_id == user.id %}
-        <form data-bind="submit: addPost">
-            Add post: <input data-bind="value: nextPostContent" placeholder="What are you thinking?" />
-            <button data-bind="click: addPost({{request.user.id}})">Post</button>
-        </form>
-        {% else %}
+          {% include 'create_post_form.html' %}
+       {% else %}
         <br>
         <button id="follow-button" data-bind="click: follow, text: following() ? 'Unfollow' : 'Follow'"></button>
         <br>
@@ -26,28 +23,12 @@
         {% ratings object %}
         <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
         <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
-
         <hr>
-        <div id="post" data-bind="foreach: posts">
-            <strong> <span data-bind="text: $data.is_shared ? 'Shared by' : 'Posted by'"></span> <a data-bind="attr: { href:$data.posted_by.url}, text: $data.posted_by.full_name"></a></strong>
-            <span data-bind="if: $data.is_shared">
-            <br>
-              <strong><a data-bind="attr: {href: $data.share.original_post}, text: 'Original post'"></a></strong>
-            </span>
-            <br>
-            <hr>
-            <strong>
-            <a data-bind="attr: { href: $data.url}, text: $data.created"></a>
-            </strong>
-            <button data-bind="click: $parent.removePost, visible: {{ request.user.id }} == posted_by.id">Delete</button>
-            <p data-bind="html: $data.content"></p>
-            <small id="like-count" data-bind="text: likes() + ' people like this'"></small>
-            <button data-bind="click: likeUnlike, text: liked() ? 'Unlike' : 'Like'">Like</button>
-            <button data-bind="click: $parent.sharePost">Share</button>
-            <hr>
-            <br>
-        </div>
-        <br>
+        {% include 'display_posts.html' %}
+       <br>
     </div>
     <script language="javascript" type="text/javascript" src="{% static 'profiles/js/profileKO.js' %}"></script>
+    <script language="javascript" type="text/javascript">
+      ko.applyBindings(new ProfileViewModel());
+    </script>
 {% endblock content%}

@@ -12,6 +12,7 @@ class PostDetailSerializer(ModelSerializer):
     url = HyperlinkedIdentityField(view_name='posts:detail')
     share = SerializerMethodField()
     like_count = SerializerMethodField()
+    liked = SerializerMethodField()
 
     class Meta:
         model = Post
@@ -29,6 +30,18 @@ class PostDetailSerializer(ModelSerializer):
 
     def get_like_count(self, obj):
         return obj.likes.count()
+
+    def get_liked(self, obj):
+        try:
+            request = self.context.get('request')
+            if request and hasattr(request, 'user'):
+                user = request.user
+                Like.objects.get(liked_by=user, post_id=obj.id)
+                return True
+            else:
+                return False
+        except Like.DoesNotExist:
+            return False
 
 
 class PostCreateSerializer(ModelSerializer):
