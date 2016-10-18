@@ -13,7 +13,7 @@ function ProfileViewModel() {
    var posts_by_user = "/api/posts/?posted_by=" + self.current_profile;
 
     self.mapPosts = function(posts) {
-      var mappedPosts = $.map(posts, function(post) { return makePost(post); })
+      var mappedPosts = $.map(posts, function(post) { return new Post(post); })
       for(let i = 0; i < mappedPosts.length; i++){
         self.posts.push(mappedPosts[i]);
       }
@@ -44,7 +44,7 @@ function ProfileViewModel() {
           data: { posted_by: user_id, content: self.nextPostContent()},
           type: "post"
         }).done(function(post) {
-          var new_post = makePost(post);
+          var new_post = new Post(post);
           self.posts.unshift(new_post);
         });
         self.nextPostContent("");
@@ -55,7 +55,7 @@ function ProfileViewModel() {
         url: "/api/posts/" + post.id + "/share/",
         type: "post"
       }).done(function(post) {
-        var new_post = makePost(post);
+        var new_post = Post(post);
         if(self.current_profile == new_post.posted_by['id']){
           self.posts.unshift(new_post);
         }

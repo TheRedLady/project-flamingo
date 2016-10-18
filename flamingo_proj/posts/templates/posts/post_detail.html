@@ -5,7 +5,7 @@
 
 {% include 'post.html' %}
 
-<p data-bind="text: post"></p>
+<div data-bind="template: { name: 'post-template', data: post() }"></div>
 
 <script language="javascript" type="text/javascript" src="{% static 'posts/js/postKO.js' %}"></script>
 

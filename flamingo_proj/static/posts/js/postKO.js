@@ -1,14 +1,9 @@
-// Class to represent a row in the seat reservations grid
-//
-//
-
 
 function PostViewModel() {
   var self = this;
-//  self.post = "trynki";
+  self.post = ko.observable();
   self.sharePost = sharePost;
   self.removePost = removePost;
-  self.baba = "baba";
 
   init();
 
@@ -17,13 +12,17 @@ function PostViewModel() {
   function init() {
     var id = getId();
     $.getJSON("/api/posts/" + id + "/", function(data) {
-      self.post = makePost(data);
+      setPost(data);
     });
+  }
+
+  function setPost(data) {
+    self.post(new Post(data));
   }
 
   function sharePost(post) {
     $.ajax({
-        url: "/api/posts/" + self.post['id'] + "/share/",
+        url: "/api/posts/" + self.post.id + "/share/",
         type: "post"
     });
   }
@@ -34,8 +33,7 @@ function PostViewModel() {
       self.post.remove(post);
     }
   }
+
 }
 
-var model = new PostViewModel();
-console.log(model);
 ko.applyBindings(new PostViewModel());

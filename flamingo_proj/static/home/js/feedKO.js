@@ -1,6 +1,3 @@
-// Class to represent a row in the seat reservations grid
-//
-//
 
 function Feed() {
   var self = this;
@@ -9,7 +6,7 @@ function Feed() {
 
   self.loopPages = function(url) {
     $.getJSON(url, function(data) {
-      var new_posts = $.map(data['results'], function(post) { return makePost(post); })
+      var new_posts = $.map(data['results'], function(post) { return new Post(post); })
       for(let i = 0; i < new_posts.length; i++){
         self.posts.push(new_posts[i]);
       }
