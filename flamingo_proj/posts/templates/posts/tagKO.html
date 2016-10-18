@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<h1> Posts by tag </h1>
+
+{% include "display_posts.html" %}
+<script language="javascript" type="text/javascript" src="{% static 'posts/js/posts_by_tagKO.js' %}"></script>
+{% endblock content %}

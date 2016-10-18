@@ -72,7 +72,7 @@ def posts_by_tag(request, tag):
         "tag": tag,
         "posts": Post.add_liked_by_user(posts, request.user)
     }
-    return render(request, 'posts/tag.html', context)
+    return render(request, 'posts/tagKO.html', context)
 
 
 @login_required

@@ -1,7 +1,13 @@
-function Feed() {
+function PostsByTag() {
   var self = this;
   self.posts = ko.observableArray([]);
   self.nextPostContent = ko.observable("");
+
+  self.tag = function () {
+    var loc = String(window.location).split("/");
+    var id = loc[loc.length - 2];
+    return id;
+    }
 
   self.loopPages = function(url) {
     $.getJSON(url, function(data) {
@@ -12,15 +18,15 @@ function Feed() {
       }
     });
   };
-  
-  self.loopPages("/api/posts/feed/");
+
+  self.loopPages("/api/posts/search/" + self.tag());
 
   self.addPost = function(user_id) {
     $.ajax("/api/posts/",
         {
           data: { posted_by: user_id, content: self.nextPostContent()},
           type: "post"
-        });    
+        });
     self.nextPostContent("");
   };
 
@@ -33,4 +39,4 @@ function Feed() {
 }
 
 
-ko.applyBindings(new Feed());
+ko.applyBindings(new PostsByTag());

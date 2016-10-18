@@ -153,7 +153,7 @@ class PostAPIViewSet(ModelViewSet):
 
 
 class PostsSearchAPIView(ListAPIView):
-    serializer_class = PostListSerializer
+    serializer_class = PostDetailSerializer
 
     def get_queryset(self):
         q = self.kwargs['q']
