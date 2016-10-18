@@ -1,6 +1,6 @@
 function Post(data) {
     this.content = ko.observable(data.content);
-    this.posted_by_name = ko.observable(data.posted_by_name);
+    this.posted_by_name = ko.observable(data.posted_by.full_name);
     this.date = ko.observable(data.created);
     this.postId = ko.observable(data.id);
 
