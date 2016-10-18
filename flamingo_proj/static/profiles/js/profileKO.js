@@ -57,16 +57,20 @@ function ProfileViewModel() {
         url: "/api/posts/" + post.id + "/share/",
         type: "post"
       }).done(function(post) {
-        var new_post = Post(post);
-        if(self.current_profile == new_post.posted_by['id']){
+        var new_post = new Post(post);
+        console.log(new_post)
+        if(self.current_profile == new_post.posted_by.id){
           self.posts.unshift(new_post);
         }
       });
     };
 
-    self.removePost = function(post) { 
-      self.posts.remove(post);
-      post.removePost();
+    self.removePost = function(post) {
+      var conf = confirm("Are you sure you want to delete this post?");
+        if(conf == true) {
+          self.posts.remove(post);
+          post.removePost();
+        }
     };
 
     self.follow = function() {
@@ -101,7 +105,10 @@ function ProfileViewModel() {
                               recipient: self.current_profile}),
             type: "post",
             contentType: "application/json",
-            success: function(result) { console.log(result) }
+            success: function(result) {
+                alert("Message Sent!");
+                self.messageBoxContent('');
+            }
         });
     }
 }

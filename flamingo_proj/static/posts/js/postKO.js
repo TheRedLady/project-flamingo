@@ -1,4 +1,3 @@
-
 function PostViewModel() {
   var self = this;
   self.post = ko.observable();
@@ -10,27 +9,30 @@ function PostViewModel() {
   //-----------
 
   function init() {
-    var id = getId();
+    id = getId();
     $.getJSON("/api/posts/" + id + "/", function(data) {
-      setPost(data);
+      self.post(new Post(data));
     });
-  }
-
-  function setPost(data) {
-    self.post(new Post(data));
   }
 
   function sharePost(post) {
     $.ajax({
-        url: "/api/posts/" + self.post.id + "/share/",
+        url: "/api/posts/" + getId() + "/share/",
         type: "post"
-    });
+    }).done(function() {alert("You shared this post");} );
   }
 
   function removePost(post) { 
     var conf = confirm("Are you sure you want to delete this post?");
     if(conf == true) {
-      self.post.remove(post);
+      self.post();
+      $.ajax({
+        url: "/api/posts/" + getId(),
+        type: "delete"
+      }).done(function() {
+        alert("You deleted this post");
+        window.location.href = "/profile/"
+        } );
     }
   }
 

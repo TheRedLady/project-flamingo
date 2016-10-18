@@ -21,20 +21,19 @@ function PostsByTag() {
 
   self.loopPages("/api/posts/search/" + self.tag());
 
-  self.addPost = function(user_id) {
-    $.ajax("/api/posts/",
-        {
-          data: { posted_by: user_id, content: self.nextPostContent()},
-          type: "post"
-        });
-    self.nextPostContent("");
-  };
-
   self.sharePost = function(post) {
       $.ajax({
         url: "/api/posts/" + post.id + "/share/",
         type: "post"
-      });
+      }).done(function() {alert("You shared this post");})
+  };
+
+  self.removePost = function(post) {
+      var conf = confirm("Are you sure you want to delete this post?");
+      if(conf == true) {
+          self.posts.remove(post);
+          post.removePost();
+      }
   };
 }
 

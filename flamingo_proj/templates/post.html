@@ -1,7 +1,7 @@
 <script type="text/html" id="post-template">
   <strong> 
   <span> 
-    <span data-bind="text: is_shared ? 'Shared by' : 'Posted by'"></span> 
+    <span data-bind="text: is_shared ? 'Shared by' : 'Posted by'"></span>
     <a data-bind="attr: { href:$data.posted_by.url}, text: $data.posted_by.full_name"></a>
   </strong>
   <span data-bind="if: $data.is_shared">
@@ -23,4 +23,3 @@
   <hr>
   <br>
 </script>
-
