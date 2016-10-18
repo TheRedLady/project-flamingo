@@ -1,7 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
-{% include "post.html" %}
+{% include 'post.html' %}
+
+<div data-bind="template: { name: 'post-template', data: post() }"></div>
+
+<script language="javascript" type="text/javascript" src="{% static 'posts/js/postKO.js' %}"></script>
 
 {% endblock content %}
