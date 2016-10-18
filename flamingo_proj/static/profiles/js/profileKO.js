@@ -2,63 +2,6 @@
 //
 //
 
-makePost = function(data) {
-  return new Post(data['id'], data['url'], data['posted_by'], data['content'],
-                  data['created'], data['share'], data['like_count'], data['liked']);
-}
-
-getId = function () {
-    var loc = String(window.location).split("/");
-    var id = loc[loc.length - 2];
-    return id;
-}
-
-function Post(id, url, postedBy, content, created, share, likes, liked) {
-    var self = this;
-    self.id = id;
-    self.url = url;
-    self.posted_by = postedBy;
-    self.content = content;
-    self.created = created;
-    self.likes = ko.observable(likes);
-    self.liked = ko.observable(liked);
-
-    self.likeUnlike = function() {
-      url = "/api/posts/" + self.id + "/like/";
-      method = "POST";
-      if(self.liked()){
-        method = "DELETE";
-        self.likes(self.likes() - 1);
-      }
-      else{
-        self.likes(self.likes() + 1);
-      }
-      $.ajax({
-        url: url,
-        method: method
-      }).done(function(data) {
-        self.liked(data['liked']);  
-      });
-    };
-
-    if (share == null) {
-      self.is_shared = false;
-      self.share = null;
-    }
-    else {
-      self.is_shared = true;
-      self.share = share;
-    }
-
-    self.removePost = function() {
-      $.ajax({
-          url: "/api/posts/" + self.id,
-          type: "delete"
-        });
-    }
-}
-
-
 // This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
 function ProfileViewModel() {
     var self = this;
@@ -142,39 +85,4 @@ function ProfileViewModel() {
 }
 
 
-function Feed(url) {
-  var self = this;
-  self.posts = ko.observableArray([]);
-  self.nextPostContent = ko.observable("");
-
-  self.loopPages = function(url) {
-    $.getJSON(url, function(data) {
-      var new_posts = $.map(data['results'], function(post) { return makePost(post); })
-      for(let i = 0; i < new_posts.length; i++){
-        self.posts.push(new_posts[i]);
-      }
-      if(data['next'] != null){
-        self.loopPages(data['next']);
-      }
-    });
-  };
-  
-  self.loopPages(url);
-
-  self.addPost = function(user_id) {
-    $.ajax("/api/posts/",
-        {
-          data: { posted_by: user_id, content: self.nextPostContent()},
-          type: "post"
-        });    
-    self.nextPostContent("");
-  };
-
-  self.sharePost = function(post) {
-      $.ajax({
-        url: "/api/posts/" + post.id + "/share/",
-        type: "post"
-      });
-  };
-
-}
+ko.applyBindings(new ProfileViewModel());

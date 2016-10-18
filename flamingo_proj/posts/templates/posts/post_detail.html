@@ -1,7 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
-{% include "post.html" %}
+{% include 'post.html' %}
+
+<p data-bind="text: post"></p>
+
+<script language="javascript" type="text/javascript" src="{% static 'posts/js/postKO.js' %}"></script>
 
 {% endblock content %}

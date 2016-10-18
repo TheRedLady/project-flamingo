@@ -25,6 +25,65 @@ $(function () {
 });
 
 
+makePost = function(data) {
+  return new Post(data['id'], data['url'], data['posted_by'], data['content'],
+                  data['created'], data['share'], data['like_count'], data['liked']);
+}
+
+getId = function () {
+    var loc = String(window.location).split("/");
+    var id = loc[loc.length - 2];
+    return id;
+}
+
+function Post(id, url, postedBy, content, created, share, likes, liked) {
+    var self = this;
+    self.id = id;
+    self.url = url;
+    self.posted_by = postedBy;
+    self.content = content;
+    self.created = created;
+    self.likes = ko.observable(likes);
+    self.liked = ko.observable(liked);
+
+    self.likeUnlike = function() {
+      url = "/api/posts/" + self.id + "/like/";
+      method = "POST";
+      if(self.liked()){
+        method = "DELETE";
+        self.likes(self.likes() - 1);
+      }
+      else{
+        self.likes(self.likes() + 1);
+      }
+      $.ajax({
+        url: url,
+        method: method
+      }).done(function(data) {
+        self.liked(data['liked']);  
+      });
+    };
+
+    if (share == null) {
+      self.is_shared = false;
+      self.share = null;
+    }
+    else {
+      self.is_shared = true;
+      self.share = share;
+    }
+
+    self.removePost = function() {
+      $.ajax({
+          url: "/api/posts/" + self.id,
+          type: "delete"
+        });
+    }
+}
+
+
+
+/*
 function like_dislike(el, postId) {
        jQuery.ajax({
             type:"POST", //post data
@@ -175,3 +234,4 @@ function auto_refresh_tab() {
       auto_refresh_tab();
   }, 8000);
 }
+*/
