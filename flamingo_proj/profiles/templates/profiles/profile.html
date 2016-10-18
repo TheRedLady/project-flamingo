@@ -10,17 +10,24 @@
         {% if object.birthdate %}
         <p> Birthdate: {{ object.birthdate }}
         {% endif %}
-       {% if object.user_id == user.id %}
-          {% include 'create_post_form.html' %}
-       {% else %}
         <br>
+        {% load ratings %}
+        {% ratings object %}
+        <hr>
+        {% if object.user_id == user.id %}
+            {% include 'create_post_form.html' %}
+        {% else %}
+        <br>
+        <button id="send-message-button" data-bind="click: openMessageBox, text: 'Send Message'"></button>
+        <form data-bind="if: showMessageBox, submit: sendMessage">
+            Message:<br>
+            <textarea data-bind="value: messageBoxContent" cols="40" rows="5"></textarea> <br>
+            <button type="submit">Send</button>
+        </form>
         <button id="follow-button" data-bind="click: follow, text: following() ? 'Unfollow' : 'Follow'"></button>
         <br>
         {% endif %}
 
-        <br>
-        {% load ratings %}
-        {% ratings object %}
         <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
         <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
         <hr>

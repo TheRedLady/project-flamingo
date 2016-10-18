@@ -1,11 +1,6 @@
-<!--<form method="POST" action=""> {% csrf_token %}
-    <input type="text" name="content" id="content">
-    <input type="button" value="Post" onClick="return submit_post(this)" />
-</form>
--->
 <form data-bind="submit: addPost">
-  Add post: 
-  <input data-bind="value: nextPostContent" placeholder="What are you thinking?" />
+  Add post: <br>
+  <textarea data-bind="value: nextPostContent" cols="40" rows="5" placeholder="What are you thinking?"></textarea> <br>
   <button data-bind="click: addPost({{request.user.id}})">Post</button>
 </form>
 

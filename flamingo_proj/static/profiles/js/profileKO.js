@@ -66,7 +66,9 @@ function ProfileViewModel() {
     self.nextPostContent = ko.observable("");
     self.current_profile = getId();
     self.following = ko.observable();
-  
+    self.showMessageBox = ko.observable(false);
+    self.messageBoxContent = ko.observable();
+
    var posts_by_user = "/api/posts/?posted_by=" + self.current_profile;
 
     self.mapPosts = function(posts) {
@@ -139,6 +141,26 @@ function ProfileViewModel() {
         self.following(data['following']);
       });
     };
+
+    self.openMessageBox = function() {
+        if (self.showMessageBox()) {
+            self.showMessageBox(false);
+        } else { self.showMessageBox(true); }
+    }
+
+    self.sendMessage = function() {
+        console.log("Sending: " + self.messageBoxContent() +
+                    " To: " + self.current_profile
+        );
+
+        $.ajax("/api/messaging/", {
+            data: ko.toJSON( {message_body: self.messageBoxContent() ,
+                              recipient: self.current_profile}),
+            type: "post",
+            contentType: "application/json",
+            success: function(result) { console.log(result) }
+        });
+    }
 }
 
 

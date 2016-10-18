@@ -1,7 +1,7 @@
 function Message(data) {
     this.id = ko.observable(data.id);
-    this.sender = ko.observable(data.sender);
-    this.recipient = ko.observable(data.recipient);
+    this.sender = ko.observable(data.sender_name);
+    this.recipient = ko.observable(data.recipient_name);
     this.message_body = ko.observable(data.message_body);
     this.sent_at = ko.observable(data.sent_at);
 }
@@ -18,7 +18,6 @@ function MessagesViewModel() {
         self.chosenFolderId(folder);
         self.chosenMailData(null);
         $.getJSON('/api/messaging', { folder: folder }, function(allData) {
-        console.log(allData['results']);
         var mappedMails = $.map(allData['results'], function(item) { return new Message(item) });
         self.messages(mappedMails);
         });
@@ -34,7 +33,6 @@ function MessagesViewModel() {
             url: "/api/messaging/" + mail.id() + "/",
             type: "delete"
         }).done(function(result){
-            console.log("result: " + result);
             self.messages.remove(mail);
         });
     }
