@@ -12,11 +12,19 @@
 </ul>
 
 
-<div data-bind="with:chosenMailData">
+<div data-bind="with: chosenMailData">
     From: <a data-bind="attr: { href: '/profile/' + sender_id(), title: sender }, text: sender"></a> <br>
     To: <a data-bind="attr: { href: '/profile/' + recipient_id(), title: recipient }, text: recipient"></a>
     <hr>
     <p data-bind="html: message_body"></p>
+
+    <button data-bind="text: 'Send Message', click: $root.openMessageBox"></button>
+    <form data-bind="if: $root.showMessageBox, submit: $root.sendMessage">
+        Message:<br>
+        <textarea data-bind="value: $root.messageBoxContent" cols="40" rows="5"></textarea> <br>
+        <button type="submit">Send</button>
+    </form>
+    <br>
 </div>
 
 <table class="mails">
@@ -26,10 +34,10 @@
         </tr>
         <tbody data-bind="foreach: messages, visible: messages().length > 0">
             <tr>
-                <td data-bind="text: sender"></td>
-                <td data-bind="text: recipient"></td>
+                <td data-bind="text: sender, click: $root.goToMail"></td>
+                <td data-bind="text: recipient, click: $root.goToMail"></td>
                 <td data-bind="text: message_body, click: $root.goToMail"></td>
-                <td data-bind="text: sent_at"></td>
+                <td data-bind="text: sent_at, click: $root.goToMail"></td>
                 <td><a href="#" data-bind="click: $root.moveToTrash">Delete</a></td>
             </tr>
         </tbody>

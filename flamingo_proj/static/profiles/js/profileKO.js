@@ -53,10 +53,10 @@ function ProfileViewModel() {
         type: "post"
       }).done(function(post) {
         var new_post = new Post(post);
-        console.log(new_post)
         if(self.current_profile == new_post.posted_by.id){
           self.posts.unshift(new_post);
-        }
+        };
+        alert("You shared this post");
       });
     };
 
