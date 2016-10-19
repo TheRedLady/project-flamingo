@@ -76,7 +76,7 @@ function MessagesViewModel() {
 
         $.ajax("/api/messaging/", {
             data: {message_body: self.messageBoxContent() ,
-                   recipient: send_to},
+                   recipient: self.sendTo()},
             type: "post",
         }).done(function() {
               alert("Message Sent!");
