@@ -2,12 +2,15 @@ from messaging.models import Message
 from .serializers import MessageDetailSerializer
 
 from django.utils import timezone
+from django.db.models import Q
 
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 
 
 class MessageViewSet(ModelViewSet):
     serializer_class = MessageDetailSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self, *args, **kwargs):
         folder = self.request.query_params.get('folder', None)
@@ -21,7 +24,7 @@ class MessageViewSet(ModelViewSet):
             else:
                 queryset = Message.objects.none()
         else:
-            queryset = Message.objects.all()
+            queryset = Message.objects.filter(Q(recipient_id=self.request.user) | Q(sender_id=self.request.user))
         return queryset
 
     def perform_create(self, serializer):

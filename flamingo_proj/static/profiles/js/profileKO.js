@@ -1,8 +1,3 @@
-// Class to represent a row in the seat reservations grid
-//
-//
-
-// This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
 function ProfileViewModel() {
     var self = this;
     self.posts = ko.observableArray([]);
@@ -43,13 +38,13 @@ function ProfileViewModel() {
     self.addPost = function(user_id) {
         $.ajax("/api/posts/",
         {
-          data: { posted_by: user_id, content: self.nextPostContent()},
-          type: "post"
+            data: { posted_by: user_id, content: self.nextPostContent()},
+            type: "post"
         }).done(function(post) {
-          var new_post = new Post(post);
-          self.posts.unshift(new_post);
+            var new_post = new Post(post);
+            self.posts.unshift(new_post);
+            self.nextPostContent("");
         });
-        self.nextPostContent("");
     };
 
     self.sharePost = function(post) {
@@ -105,11 +100,10 @@ function ProfileViewModel() {
                               recipient: self.current_profile}),
             type: "post",
             contentType: "application/json",
-            success: function(result) {
-                alert("Message Sent!");
-                self.messageBoxContent('');
-            }
-        });
+        }).done(function() {
+              alert("Message Sent!");
+              self.messageBoxContent('');
+           });
     }
 }
 

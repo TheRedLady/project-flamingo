@@ -55,7 +55,7 @@ function Post(data) {
         url: url,
         method: method
       }).done(function(data) {
-        self.liked(data['liked']);  
+        self.liked(data['liked']);
       });
     };
 

@@ -13,7 +13,6 @@ function MessagesViewModel() {
 
     self.getTags = function() {
         $.getJSON('/api/posts/trending/', function(allData) {
-        console.log(allData['results']);
         var mappedTags = $.map(allData['results'], function(item) { return new Tag(item) });
         self.tags(mappedTags);
         });

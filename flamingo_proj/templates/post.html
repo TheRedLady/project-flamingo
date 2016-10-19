@@ -1,8 +1,7 @@
 <script type="text/html" id="post-template">
-  <strong> 
-  <span> 
+  <strong>
     <span data-bind="text: is_shared ? 'Shared by' : 'Posted by'"></span>
-    <a data-bind="attr: { href:$data.posted_by.url}, text: $data.posted_by.full_name"></a>
+    <a data-bind="attr: { href: $data.posted_by.url}, text: $data.posted_by.full_name"></a>
   </strong>
   <span data-bind="if: $data.is_shared">
     <br>
@@ -13,9 +12,9 @@
   <br>
   <hr>
   <strong>
-    <a data-bind="attr: { href: $data.url}, text: $data.created"></a>
+    <a data-bind="attr: { href: url}, text: $data.created"></a>
   </strong>
-  <p data-bind="html: $data.content"></p>
+  <p data-bind="html: content"></p>
   <button data-bind="click: $parent.removePost, visible: {{ request.user.id }} == posted_by.id">Delete</button>
   <button data-bind="click: $parent.sharePost">Share</button>
   <small id="like-count" data-bind="text: likes() + ' people like this'"></small>
