@@ -19,7 +19,7 @@ class TimeStampedModel(models.Model):
 @python_2_unicode_compatible
 class Post(TimeStampedModel):
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL)
-    content = models.TextField(max_length=1000, editable=True)
+    content = models.TextField(max_length=1000, editable=True, null=False)
 
     def get_hash_tags(self):
         return set(re.findall(r'(?<![\w\d])#[a-zA-Z0-9]+(?![\w\d])', self.content))
@@ -77,6 +77,10 @@ class Post(TimeStampedModel):
     @classmethod
     def get_latest(cls):
         return cls.objects.order_by('-created')[:100]
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super(Post, self).save(*args, **kwargs)
 
 
 @python_2_unicode_compatible

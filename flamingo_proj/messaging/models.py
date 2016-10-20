@@ -29,9 +29,9 @@ class MessageManager(models.Manager):
 
 @python_2_unicode_compatible
 class Message(models.Model):
-    message_body = models.TextField(max_length=300)
+    message_body = models.TextField(max_length=300, blank=False, null=False)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="sent_messages")
-    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="received_messages")
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="received_messages", blank=False)
     sent_at = models.DateTimeField("sent at", null=True, blank=True)
     sender_deleted_at = models.DateTimeField(null=True, blank=True)
     sender_deleted_perm = models.BooleanField(default=False)
@@ -48,6 +48,7 @@ class Message(models.Model):
         pass
 
     def save(self, **kwargs):
+        self.full_clean()
         if not self.id:
             self.sent_at = timezone.now()
         super(Message, self).save(**kwargs)

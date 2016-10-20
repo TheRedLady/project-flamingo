@@ -17,7 +17,7 @@ function MessagesViewModel() {
     self.chosenMailData = ko.observable();
     self.messages = ko.observableArray([]);
     self.showMessageBox = ko.observable(false);
-    self.messageBoxContent = ko.observable();
+    self.messageBoxContent = ko.observable(null);
 
     self.goToFolder = function(folder) {
         self.chosenFolderId(folder);
@@ -73,6 +73,10 @@ function MessagesViewModel() {
         console.log("Sending: " + self.messageBoxContent() +
                     " To: " + self.sendTo()
         );
+        if (!self.messageBoxContent()) {
+          alert("Please add some content")
+          return;
+        }
 
         $.ajax("/api/messaging/", {
             data: {message_body: self.messageBoxContent() ,

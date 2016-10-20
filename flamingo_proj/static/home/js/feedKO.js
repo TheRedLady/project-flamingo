@@ -16,6 +16,10 @@ function Feed() {
   self.loopPages("/api/posts/feed/");
 
   self.addPost = function(user_id) {
+      if (!self.nextPostContent()) {
+        alert("Please add some content")
+        return;
+      }
       $.ajax("/api/posts/",
           {
               data: { posted_by: user_id, content: self.nextPostContent()},

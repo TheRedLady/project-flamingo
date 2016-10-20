@@ -36,6 +36,10 @@ function ProfileViewModel() {
     self.loopPages(posts_by_user);
 
     self.addPost = function(user_id) {
+        if (!self.nextPostContent()) {
+            alert("Please add some content")
+            return;
+        }
         $.ajax("/api/posts/",
         {
             data: { posted_by: user_id, content: self.nextPostContent()},
@@ -91,9 +95,15 @@ function ProfileViewModel() {
     }
 
     self.sendMessage = function() {
+
         console.log("Sending: " + self.messageBoxContent() +
                     " To: " + self.current_profile
         );
+
+        if (!self.messageBoxContent()) {
+          alert("Please add some content")
+          return;
+        }
 
         $.ajax("/api/messaging/", {
             data: ko.toJSON( {message_body: self.messageBoxContent() ,
