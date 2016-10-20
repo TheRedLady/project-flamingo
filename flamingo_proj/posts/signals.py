@@ -6,4 +6,3 @@ from django.conf import settings
 @receiver(post_save, sender=settings.AUTH_POST_MODEL)
 def create_tags(sender, instance, created, **kwargs):
     instance.create_hashtags()
-

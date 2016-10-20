@@ -7,5 +7,3 @@ from django.conf import settings
 def delete_permanent(sender, instance, created, **kwargs):
     if instance.sender_deleted_perm and instance.recipient_deleted_perm:
         instance.delete()
-
-
