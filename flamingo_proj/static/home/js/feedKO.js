@@ -34,7 +34,7 @@ function Feed() {
       $.ajax({
         url: "/api/posts/" + post.id + "/share/",
         type: "post"
-      });
+      }).done(function() { alert("You shared this post")});
   };
 }
 
