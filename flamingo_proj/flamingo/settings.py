@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 # Application definition
 AUTH_USER_MODEL = 'profiles.MyUser'
 AUTH_POST_MODEL = 'posts.Post'
+AUTH_MESSAGING_MODEL = 'messaging.Message'
 
 INSTALLED_APPS = [
     'rest_framework',

@@ -8,6 +8,9 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
 
 
+from . import signals
+
+
 class MessageManager(models.Manager):
 
     def inbox_for(self, user):
@@ -58,3 +61,4 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['-sent_at']
+
