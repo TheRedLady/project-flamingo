@@ -51,6 +51,27 @@ function SearchViewModel() {
         }
     }
 
+    self.sharePost = function(post) {
+      $.ajax({
+        url: "/api/posts/" + post.id + "/share/",
+        type: "post"
+      }).done(function(post) {
+        var new_post = new Post(post);
+        if(self.current_profile == new_post.posted_by.id){
+          self.posts.unshift(new_post);
+        };
+        alert("You shared this post");
+      });
+    };
+
+    self.removePost = function(post) {
+      var conf = confirm("Are you sure you want to delete this post?");
+        if(conf == true) {
+          self.posts.remove(post);
+          post.removePost();
+        }
+    };
+
     self.findResults = function () {
         self.goToFolder('Posts');
     }
