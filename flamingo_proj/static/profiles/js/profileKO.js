@@ -11,9 +11,7 @@ function ProfileViewModel() {
 
     self.mapPosts = function(posts) {
       var mappedPosts = $.map(posts, function(post) { return new Post(post); })
-      for(let i = 0; i < mappedPosts.length; i++){
-        self.posts.push(mappedPosts[i]);
-      }
+      self.posts(mappedPosts)
     }
 
     self.loopPages = function(url) {

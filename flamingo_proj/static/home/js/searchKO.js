@@ -1,15 +1,3 @@
-function Post(data) {
-    this.content = ko.observable(data.content);
-    this.posted_by_name = ko.observable(data.posted_by.full_name);
-    this.date = ko.observable(data.created);
-    this.postId = ko.observable(data.id);
-
-    this.goToPost = function () {
-        console.log(data)
-        window.location.href = "/posts/" + this.postId();
-    }
-}
-
 function Profile(data) {
     this.fullName = data.user['first_name'] + " " + data.user['last_name'];
     this.profileUrl = ko.observable(data.url);
@@ -28,7 +16,7 @@ function SearchViewModel() {
     self.chosenFolderId = ko.observable();
     self.searchText = ko.observable();
     self.results = ko.observableArray([]);
-    self.postResults = ko.observableArray([]);
+    self.posts = ko.observableArray([]);
     self.profileResults = ko.observableArray([]);
 
     self.postTabSelected = ko.observable();
@@ -37,18 +25,28 @@ function SearchViewModel() {
     self.goToFolder = function(folder) {
         self.chosenFolderId(folder);
         if (folder === 'Posts') {
-            self.postTabSelected(true);
-            self.profileTabSelected(false);
-            $.getJSON('/api/posts/search/' + self.searchText(), {}, function(allData) {
-            var mappedPosts= $.map(allData['results'], function(item) { return new Post(item) });
-            self.postResults(mappedPosts);
+          self.postTabSelected(true);
+          self.profileTabSelected(false);
+
+          self.loopPages = function(url) {
+            if (!self.searchText()) {self.posts([]); self.profileResults([]); return;}
+            $.getJSON(url, function(data) {
+              var new_posts = $.map(data['results'], function(post) { return new Post(post); })
+              self.posts(new_posts);
+              if(data['next'] != null){
+                self.loopPages(data['next']);
+              }
             });
+          };
+
+          self.loopPages('/api/posts/search/' + self.searchText());
         } else {
+            self.postTabSelected(false);
+            self.profileTabSelected(true);
+            if (!self.searchText()) {self.posts([]); self.profileResults([]); return;}
             $.getJSON('/api/profiles/search/' + self.searchText(), {}, function(allData) {
             var mappedProfiles= $.map(allData['results'], function(item) { return new Profile(item) });
             self.profileResults(mappedProfiles);
-            self.postTabSelected(false);
-            self.profileTabSelected(true);
             });
         }
     }

@@ -16,20 +16,9 @@
                    click: $root.goToFolder"></li>
 </ul>
 
-<table class="mails" data-bind="if: postTabSelected">
-    <thead>
-        <tr>
-            <th>Posted By</th><th>Post</th><th>Date</th>
-        </tr>
-        <tbody data-bind="foreach: postResults">
-            <tr data-bind="click: goToPost">
-                <td data-bind="text: posted_by_name"></td>
-                <td data-bind="text: content"></td>
-                <td data-bind="text: date"></td>
-            </tr>
-        </tbody>
-    </thead>
-</table>
+<div data-bind="if: postTabSelected">
+    {% include 'display_posts.html' %}
+</div>
 
 <table class="mails" data-bind="if: profileTabSelected">
     <thead>
