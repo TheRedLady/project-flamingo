@@ -1,76 +1,30 @@
 function ProfileViewModel() {
     var self = this;
-    self.posts = ko.observableArray([]);
-    self.nextPostContent = ko.observable("");
     self.current_profile = getId();
     self.following = ko.observable();
     self.showMessageBox = ko.observable(false);
     self.messageBoxContent = ko.observable();
 
-   var posts_by_user = "/api/posts/?posted_by=" + self.current_profile;
+    self.follow = follow;
 
-    self.mapPosts = function(posts) {
-      var mappedPosts = $.map(posts, function(post) { return new Post(post); })
-      self.posts(mappedPosts)
+
+    init();
+
+
+    //----
+    
+
+    function init() {
+      $.ajax({
+        url: "/api/profiles/" + self.current_profile + "/follow/",
+        type: "get"
+      }).done(function(data) {
+        self.following(data['following']);
+      });
+      
     }
 
-    self.loopPages = function(url) {
-
-      $.getJSON(url, function(data) {
-        self.mapPosts(data['results']);
-        if(data['previous'] == null) {
-          var follow_url = "/api/profiles/" + self.current_profile + "/follow/";
-          $.getJSON(follow_url, function(data) {
-            self.following(data['following']);
-          });
-        }
-        if(data['next'] != null){
-          self.loopPages(data['next']);
-        }
-      });
-
-    };
-
-    self.loopPages(posts_by_user);
-
-    self.addPost = function(user_id) {
-        if (!self.nextPostContent()) {
-            alert("Please add some content")
-            return;
-        }
-        $.ajax("/api/posts/",
-        {
-            data: { posted_by: user_id, content: self.nextPostContent()},
-            type: "post"
-        }).done(function(post) {
-            var new_post = new Post(post);
-            self.posts.unshift(new_post);
-            self.nextPostContent("");
-        });
-    };
-
-    self.sharePost = function(post) {
-      $.ajax({
-        url: "/api/posts/" + post.id + "/share/",
-        type: "post"
-      }).done(function(post) {
-        var new_post = new Post(post);
-        if(self.current_profile == new_post.posted_by.id){
-          self.posts.unshift(new_post);
-        };
-        alert("You shared this post");
-      });
-    };
-
-    self.removePost = function(post) {
-      var conf = confirm("Are you sure you want to delete this post?");
-        if(conf == true) {
-          self.posts.remove(post);
-          post.removePost();
-        }
-    };
-
-    self.follow = function() {
+    function follow() {
       var url = "/api/profiles/" + self.current_profile; 
       if(self.following()) {
         url += "/unfollow/";
@@ -115,5 +69,7 @@ function ProfileViewModel() {
     }
 }
 
+var cont = new PostContainer("/api/posts/search/?posted_by=" + getId(), true);
+ProfileViewModel.prototype = Object.create(cont);
 
 ko.applyBindings(new ProfileViewModel());

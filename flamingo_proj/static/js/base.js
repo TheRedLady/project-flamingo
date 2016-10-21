@@ -41,7 +41,27 @@ function Post(data) {
     self.likes = ko.observable(data['like_count']);
     self.liked = ko.observable(data['liked']);
 
-    self.likeUnlike = function() {
+    self.likeUnlike = likeUnlike;
+    self.sharePost = sharePost;
+    self.removePost = removePost; 
+    
+    init();
+
+    //---------------
+
+    function init() {
+      var share = data['share'];
+      if (share === null) {
+        self.is_shared = false;
+        self.share = null;
+      }
+      else {
+        self.is_shared = true;
+        self.share = share;
+      }
+    }
+    
+    function likeUnlike() {
       url = "/api/posts/" + self.id + "/like/";
       method = "POST";
       if(self.liked()){
@@ -59,22 +79,99 @@ function Post(data) {
       });
     };
 
-    var share = data['share'];
-    if (share === null) {
-      self.is_shared = false;
-      self.share = null;
-    }
-    else {
-      self.is_shared = true;
-      self.share = share;
-    }
 
-    self.removePost = function() {
+    function removePost() {
       $.ajax({
           url: "/api/posts/" + self.id,
           type: "delete"
-        });
+      }).done(function() {
+        alert("You deleted this post");
+      });
     }
+
+
+    function sharePost() {
+      $.ajax({
+        url: "/api/posts/" + self.id + "/share/",
+        type: "post"
+      }).done(function(data) {
+        alert("You shared this post");
+        return new Post(data);
+      });
+    }
+}
+
+
+function PostContainer(url, append) {
+  var self = this;
+  self.posts = ko.observableArray([]);
+  self.nextPostContent = ko.observable("");
+  self.append = append;
+  
+  self.addPost = addPost;
+  self.sharePost = sharePost;
+  self.removePost = removePost;
+  self.mapPosts = mapPosts;
+
+  init();
+
+  //---------
+
+
+  function init() {
+   loopPages(url); 
+  }
+
+  function mapPosts(posts) {
+    var mappedPosts = $.map(posts, function(post) { return new Post(post); })
+    for(let i = 0; i < mappedPosts.length; i++) {
+      self.posts.push(mappedPosts[i]);
+    }
+  }
+
+  function loopPages(url) {
+    $.getJSON(url, function(data) {
+      self.mapPosts(data['results']);
+      if(data['next'] != null){
+        loopPages(data['next']);
+      }
+    });
+  };
+
+
+  function addPost() {
+      if (!self.nextPostContent()) {
+        alert("Please add some content")
+        return;
+      }
+      $.ajax("/api/posts/",
+          {
+              data: { content: self.nextPostContent()},
+              type: "post"
+          }).done(function(data) {
+              self.nextPostContent("");
+              if(self.append) {
+                self.posts.unshift(new Post(data));
+              }
+              alert("Success. You can see your post in your profile.");
+          });
+  };
+
+  function removePost(post) {
+    var conf = confirm("Are you sure you want to delete this post?");
+    if(conf == true) {
+      self.posts.remove(post);
+      post.removePost();
+    }
+  }
+
+  function sharePost(post) {
+    var new_post = post.sharePost();
+    if(self.append) {
+      self.posts.unshift(new_post);
+    }
+  };
+
 }
 
 
