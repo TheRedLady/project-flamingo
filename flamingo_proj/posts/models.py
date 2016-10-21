@@ -19,7 +19,7 @@ class TimeStampedModel(models.Model):
 @python_2_unicode_compatible
 class Post(TimeStampedModel):
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL)
-    content = models.TextField(max_length=1000, editable=True)
+    content = models.TextField(max_length=1000, editable=True, null=False)
 
     def get_hash_tags(self):
         return set(re.findall(r'(?<![\w\d])#[a-zA-Z0-9]+(?![\w\d])', self.content))
@@ -48,6 +48,7 @@ class Post(TimeStampedModel):
         for old in old_refs:
             old.posts.remove(self)
             old.save()
+        self.refresh_from_db()
 
     @staticmethod
     def add_shared_property(set_of_posts):
@@ -77,6 +78,10 @@ class Post(TimeStampedModel):
     def get_latest(cls):
         return cls.objects.order_by('-created')[:100]
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super(Post, self).save(*args, **kwargs)
+
 
 @python_2_unicode_compatible
 class Share(TimeStampedModel):
@@ -97,6 +102,8 @@ class Tag(models.Model):
         latest_posts = Post.get_latest()
         tags_found = [tag for post in latest_posts for tag in post.tag_set.all()]
         tag_counts = Counter(tags_found).most_common(5)
+        for t in tag_counts:
+            t[0].occurrences_count = t[1]
         return [t[0] for t in tag_counts]
 
     def __str__(self):

@@ -9,7 +9,7 @@ from django.http import JsonResponse
 
 
 from .forms import PostForm
-from .models import Tag, Post, Like, Share
+from .models import Post, Tag, Like, Share
 
 
 class PostView(LoginRequiredMixin, generic.DetailView):
@@ -72,7 +72,7 @@ def posts_by_tag(request, tag):
         "tag": tag,
         "posts": Post.add_liked_by_user(posts, request.user)
     }
-    return render(request, 'posts/tag.html', context)
+    return render(request, 'posts/tagKO.html', context)
 
 
 @login_required

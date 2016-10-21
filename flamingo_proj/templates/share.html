@@ -1,7 +1,0 @@
-<div class="shared" id="shared">
-  <hr>
-  <strong> Shared by {{ post.shared_by.get_full_name }} on {{ post.created }} </strong>
-  {% with post=post.original_post %}
-    {% include "post.html" %}
-  {% endwith %}
-</div>

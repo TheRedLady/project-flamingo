@@ -1,57 +1,24 @@
-<div class="post" id="post{{ post.id }}">
-    <div>
-      <hr>
-        {% if post.shared %}
-          <strong> Shared by <a href="{{ post.posted_by.get_absolute_url }}">{{ post.posted_by.get_full_name }}</a></strong>
-          <br>
-          <strong>
-            <a href="{{ post.shared.original_post.get_absolute_url }}"> Original Post</a>
-          </strong>
-          <br>
-        {% else %}
-          <strong> Posted by <a href="{{ post.posted_by.get_absolute_url }}">{{ post.posted_by.get_full_name }}</a>
-          </strong>
-          <br>
-        {% endif %}
-      <hr>
-        <strong> <a href="{{ post.get_absolute_url }}">{{ post.created }}</a> </strong>
-
-        {% if post.posted_by == request.user %}
-        <input class='delete-button'
-               onClick="return post_delete(this, {{ post.id }})"
-               type="button"
-               value="Delete"
-               id="delete_button{{ post.id }}"
-               data-post-id="{{ post.id }}" />
-        {% endif %}
-        <div class="post-content">
-        <br>
-        {{ post.content|safe|urlize|linebreaksbr }} 
-        <br>
-        </div>
-
-        <div>
-        <small class = 'like-count'
-               id="like_count{{ post.id }}" > {{ post.likes.count }} people like this </small>
-
-        <input class='like-button'
-               onClick="return like_dislike(this, {{ post.id }})"
-               type="button"
-               {% if post.liked_by_user %}
-               value="Dislike"
-               {% else %}
-               value = "Like"
-               {% endif %}
-               id="like_button{{ post.id }}"
-               data-post-id="{{ post.id }}" />
-
-        <input class='share-button'
-               onClick="return post_share(this, {{ post.id }})"
-               type="button"
-               value="Share"
-               id="sharebutton{{ post.id }}"
-               data-post-id="{{ post.id }}" />
-        </div>
-    </div>
+<script type="text/html" id="post-template">
+  <strong>
+    <span data-bind="text: is_shared ? 'Shared by' : 'Posted by'"></span>
+    <a data-bind="attr: { href: $data.posted_by.url}, text: $data.posted_by.full_name"></a>
+  </strong>
+  <span data-bind="if: $data.is_shared">
     <br>
-</div>
+    <strong>
+      <a data-bind="attr: {href: $data.share.original_post}, text: 'Original post'"></a>
+    </strong>
+  </span>
+  <br>
+  <hr>
+  <strong>
+    <a data-bind="attr: { href: url}, text: $data.created"></a>
+  </strong>
+  <p data-bind="html: content"></p>
+  <button data-bind="click: $parent.removePost, visible: {{ request.user.id }} == posted_by.id">Delete</button>
+  <button data-bind="click: $parent.sharePost">Share</button>
+  <small id="like-count" data-bind="text: likes() + ' people like this'"></small>
+  <button data-bind="click: likeUnlike, text: liked() ? 'Unlike' : 'Like'">Like</button>
+  <hr>
+  <br>
+</script>

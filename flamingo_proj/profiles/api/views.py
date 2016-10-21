@@ -2,10 +2,13 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.filters import DjangoFilterBackend, OrderingFilter
+from rest_framework.generics import ListAPIView
 
 
 from profiles.models import Profile
+from home.utils import get_query, get_key
 from .permissions import UserPermission
+from .utils import get_follow_status
 from .serializers import (
     ProfileCreateSerializer,
     ProfileDetailSerializer,
@@ -31,45 +34,43 @@ class ProfileViewSet(ModelViewSet):
     @detail_route(methods=['get', 'post'])
     def follow(self, request, pk=None):
         profile = self.get_object()
-        current_profile = Profile.objects.get(user_id=self.request.user.id)
+        current_user = Profile.objects.get(user_id=self.request.user.id)
         profile_data = ProfileDetailSerializer(profile, context={'request': request}).data
-        if profile.user_id == current_profile.user_id:
-            profile_data['status'] = 'User cannot follow self.'
-            return Response(profile_data)
+        following = get_follow_status(current_user, profile)
         if request.method == 'GET':
-            if current_profile in profile.followed_by.all():
-                profile_data['status'] = 'You are following this user.'
-            else:
-                profile_data['status'] = 'You are not following this user.'
+            profile_data['following'] = following
             return Response(profile_data)
         if request.method == 'POST':
-            if current_profile in profile.followed_by.all():
-                profile_data['status'] = 'You are already following this user.'
-            else:
-                current_profile.follows.add(profile)
-                current_profile.save()
-                profile_data['status'] = 'You are now following this user.'
+            if not following:
+                current_user.follows.add(profile)
+                current_user.save()
+                following = True
+            profile_data['following'] = following
             return Response(profile_data)
 
     @detail_route(methods=['get', 'post'])
     def unfollow(self, request, pk=None):
         profile = self.get_object()
-        current_profile = Profile.objects.get(user_id=self.request.user.id)
+        current_user = Profile.objects.get(user_id=self.request.user.id)
         profile_data = ProfileDetailSerializer(profile, context={'request': request}).data
-        if profile.user_id == current_profile.user_id:
-            profile_data['status'] = 'User cannot follow self.'
-            return Response(profile_data)
+        following = get_follow_status(current_user, profile)
         if request.method == 'GET':
-            if current_profile in profile.followed_by.all():
-                profile_data['status'] = 'You are following this user.'
-            else:
-                profile_data['status'] = 'You are not following this user.'
+            profile_data['following'] = following
             return Response(profile_data)
         if request.method == 'POST':
-            if current_profile not in profile.followed_by.all():
-                profile_data['status'] = 'You are not following this user.'
-            else:
-                current_profile.follows.remove(profile)
-                current_profile.save()
-                profile_data['status'] = 'You are no longer following this user.'
+            if following:
+                current_user.follows.remove(profile)
+                current_user.save()
+                following = False
+            profile_data['following'] = following
             return Response(profile_data)
+
+
+class ProfilesSearchAPIView(ListAPIView):
+    serializer_class = ProfileDetailSerializer
+
+    def get_queryset(self):
+        q = self.kwargs['q']
+        posts_query = get_query(q, ['user__first_name', 'user__last_name', ])
+        posts = Profile.objects.filter(posts_query)
+        return posts

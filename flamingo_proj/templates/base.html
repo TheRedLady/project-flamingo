@@ -5,18 +5,18 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %} {{user.get_full_name }} | Flamingo {% endblock title %}</title>
+    <title>{% block title %}Flamingo{% endblock title %}</title>
     <style> {% block style %}{% endblock style %} </style>
     <link rel="stylesheet" href="{% static "css/base.css" %}">
     <script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="  crossorigin="anonymous"></script>
-    <script language="javascript" type="text/javascript" src="{% static "js/base.js" %}"></script>
+    <script language="javascript" type="text/javascript" src="{% static 'js/base.js' %}"></script>
 </head>
 <body>
     <div class="side-navigation" id="sidenav">
         {% if user.is_authenticated %}
           <a href="{% url 'home' %}">Feed</a>
           <a href="{% url 'profiles:go-to-profile' %}">My Profile</a>
-          <a href="{% url 'messages:main' %}">Messages</a>
+          <a href="/messaging/">Messages</a>
           <a href="{% url 'posts:trending' %}">Trending</a>
           <a href="{% url 'search' %}">Search</a>
           <a href="#" onclick='return logout();'>Logout</a>
@@ -32,6 +32,7 @@
             <h1><a href="{% url 'home' %}"> Flamingo Social Network </a></h1> 
         </div>
         {% include "messages_display.html" %}
+        <script language="javascript" type="text/javascript" src="{% static 'js/knockout-3.4.0.js' %}"></script>
         <div class="container" id="container">
             {% block content %}{% endblock content %}
         </div>

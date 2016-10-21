@@ -1,29 +1,38 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %} {{ object }} | {{ block.super }} {% endblock title %}
+{% block title %} {{ profile }} | {{ block.super }} {% endblock title %}
 {% block content %}
     <div class="user-profile" id="userprofile{{object.user_id}}">
-    {% if user.id == object.user_id %} 
-        <h1> Me </h1>
-    {% else %} 
-        <h1> {{ object }} </h1>
-        {% include "message_form.html" %}
-        {% include "follow_button.html" %}
-    {% endif %}
 
-    {% if object.birthdate %}
-        <p> Birthdate: {{ object.birthdate }} <br>
-    {% endif %}
-    {% load ratings %}
-    {% ratings object %}
-    <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
-    <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
-        {% if object.user_id == user.id %}
-        {% include "create_post_form.html" %}
+        <h2>{{ profile }}</h2>
+
+        {% if object.birthdate %}
+        <p> Birthdate: {{ object.birthdate }}
         {% endif %}
         <br>
-    <h2> Posts: </h2>
-    {% include "display_posts.html" %}
+        {% load ratings %}
+        {% ratings object %}
+        <hr>
+        {% if object.user_id == user.id %}
+            {% include 'create_post_form.html' %}
+        {% else %}
+        <br>
+        <button id="send-message-button" data-bind="click: openMessageBox, text: 'Send Message'"></button>
+        <form data-bind="if: showMessageBox, submit: sendMessage">
+            Message:<br>
+            <textarea data-bind="value: messageBoxContent" cols="40" rows="5"></textarea> <br>
+            <button type="submit">Send</button>
+        </form>
+        <button id="follow-button" data-bind="click: follow, text: following() ? 'Unfollow' : 'Follow'"></button>
+        <br>
+        {% endif %}
+
+        <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
+        <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
+        <hr>
+        {% include 'display_posts.html' %}
+       <br>
     </div>
+    <script language="javascript" type="text/javascript" src="{% static 'profiles/js/profileKO.js' %}"></script>
 {% endblock content%}

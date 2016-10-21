@@ -1,23 +1,27 @@
 from __future__ import unicode_literals
 
-from collections import defaultdict
-
 from django.db import models
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
+from . import signals
 
 
 class MessageManager(models.Manager):
 
     def inbox_for(self, user):
-        return self.filter(recipient=user, recipient_deleted_at__isnull=True)
+        return self.filter(recipient=user, recipient_deleted_at__isnull=True).order_by('-sent_at')
 
     def outbox_for(self, user):
-        return self.filter(sender=user, sender_deleted_at__isnull=True)
+        return self.filter(sender=user, sender_deleted_at__isnull=True).order_by('-sent_at')
 
     def trash_for(self, user):
-        return self.filter(recipient=user, recipient_deleted_at__isnull=False, recipient_deleted_perm=False) | self.filter(sender=user, sender_deleted_at__isnull=False, sender_deleted_perm=False)
+        return (self.filter(recipient=user,
+                            recipient_deleted_at__isnull=False,
+                            recipient_deleted_perm=False) | \
+                self.filter(sender=user,
+                            sender_deleted_at__isnull=False,
+                            sender_deleted_perm=False)).order_by('-sent_at')
 
     def not_seen_for(self, user):
         return self.filter(recipient=user, recipient_seen=False, recipient_deleted_at__isnull=True)
@@ -25,9 +29,9 @@ class MessageManager(models.Manager):
 
 @python_2_unicode_compatible
 class Message(models.Model):
-    message_body = models.TextField(max_length=300)
+    message_body = models.TextField(max_length=300, blank=False, null=False)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="sent_messages")
-    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="received_messages")
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="received_messages", blank=False)
     sent_at = models.DateTimeField("sent at", null=True, blank=True)
     sender_deleted_at = models.DateTimeField(null=True, blank=True)
     sender_deleted_perm = models.BooleanField(default=False)
@@ -44,6 +48,7 @@ class Message(models.Model):
         pass
 
     def save(self, **kwargs):
+        self.full_clean()
         if not self.id:
             self.sent_at = timezone.now()
         super(Message, self).save(**kwargs)
@@ -53,3 +58,4 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['-sent_at']
+

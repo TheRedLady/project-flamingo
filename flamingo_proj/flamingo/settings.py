@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 # Application definition
 AUTH_USER_MODEL = 'profiles.MyUser'
 AUTH_POST_MODEL = 'posts.Post'
+AUTH_MESSAGING_MODEL = 'messaging.Message'
 
 INSTALLED_APPS = [
     'rest_framework',
@@ -138,6 +139,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
+    'DATETIME_FORMAT': "%b %d, %Y, %H:%M",
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
 }

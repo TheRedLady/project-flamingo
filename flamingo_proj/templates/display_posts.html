@@ -1,9 +1,5 @@
 <div id="posts">
-{% if posts %}
-  {% for post in posts %}
-    {% include "post.html" %}
-  {% endfor %}
-{% else %}
-  <h1>No posts</h1>
-{% endif %}
+  <div data-bind="template: { name: 'post-template', foreach: posts }"></div>
+  {% include 'post.html' %}
+  <h1 data-bind="ifnot: posts().length">No posts</h1>
 </div>

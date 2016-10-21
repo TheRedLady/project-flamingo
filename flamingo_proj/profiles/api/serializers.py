@@ -1,4 +1,9 @@
-from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField, ValidationError
+from rest_framework.serializers import (
+    ModelSerializer,
+    HyperlinkedIdentityField,
+    SerializerMethodField,
+    ValidationError,
+)
 
 
 from profiles.models import MyUser, Profile
@@ -83,7 +88,7 @@ class ProfileDetailSerializer(ModelSerializer):
 
     user = MyUserDetailSerializer(read_only=True)
     follows = FollowSerializer(read_only=True, many=True)
-    url = HyperlinkedIdentityField(view_name = 'profile-detail')
+    url = HyperlinkedIdentityField(view_name='profile-detail')
 
     class Meta:
         model = Profile
@@ -117,3 +122,24 @@ class ProfileUpdateSerializer(ModelSerializer):
             instance.follows.add(profile)
         instance.save()
         return instance
+
+
+class PostedBySerializer(ModelSerializer):
+
+    url = SerializerMethodField()
+    full_name = SerializerMethodField()
+
+    class Meta:
+        model = MyUser
+        fields = [
+            'id',
+            'url',
+            'email',
+            'full_name',
+        ]
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
+
+    def get_url(self, obj):
+        return obj.get_absolute_url()
