@@ -1,24 +1,36 @@
 <script type="text/html" id="post-template">
+<div class="post">
+
+  <div class="post-information">	
   <strong>
-    <span data-bind="text: is_shared ? 'Shared by' : 'Posted by'"></span>
-    <a data-bind="attr: { href: $data.posted_by.url}, text: $data.posted_by.full_name"></a>
+    <span data-bind="text: is_shared ? 'Shared by' : 'Posted by'"></span> <a style="text-decoration: none" data-bind="attr: { href: $data.posted_by.url}, text: $data.posted_by.full_name"></a> on
+      <a data-bind="attr: { href: url}, text: $data.created"></a>
   </strong>
   <span data-bind="if: $data.is_shared">
-    <br>
     <strong>
-      <a data-bind="attr: {href: $data.share.original_post}, text: 'Original post'"></a>
+      <br>
+      <a style="text-decoration: none" data-bind="attr: {href: $data.share.original_post}, text: 'Original post'"></a>
     </strong>
   </span>
   <br>
-  <hr>
-  <strong>
-    <a data-bind="attr: { href: url}, text: $data.created"></a>
-  </strong>
-  <p data-bind="html: content"></p>
-  <button data-bind="click: $parent.removePost, visible: {{ request.user.id }} == posted_by.id">Delete</button>
-  <button data-bind="click: $parent.sharePost">Share</button>
+  </div>
+
+  <div class="delete-button">
+  <button data-bind="click: $parent.removePost, visible: {{ request.user.id }} == posted_by.id, text: 'Delete'"></button>
+  </div>
+  
+  <div class="post-content">
+    <p data-bind="html: content"></p>
+  </div>
+
+  <div class="buttons-social">
   <small id="like-count" data-bind="text: likes() + ' people like this'"></small>
+  <br>
   <button data-bind="click: likeUnlike, text: liked() ? 'Unlike' : 'Like'">Like</button>
+  <button data-bind="click: $parent.sharePost">Share</button>
+  </div>
+
   <hr>
   <br>
+</div>
 </script>

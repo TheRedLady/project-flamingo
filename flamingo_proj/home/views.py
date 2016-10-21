@@ -66,3 +66,4 @@ def search(request):
                       'profiles': profiles_result,
                       'profiles_count': len(profiles_result),
                       'search_results': results, 'search': query_string})
+
