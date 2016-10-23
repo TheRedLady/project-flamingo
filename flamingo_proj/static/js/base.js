@@ -43,8 +43,8 @@ function Post(data) {
 
     self.likeUnlike = likeUnlike;
     self.sharePost = sharePost;
-    self.removePost = removePost; 
-    
+    self.removePost = removePost;
+
     init();
 
     //---------------
@@ -60,7 +60,7 @@ function Post(data) {
         self.share = share;
       }
     }
-    
+
     function likeUnlike() {
       url = "/api/posts/" + self.id + "/like/";
       method = "POST";
@@ -89,16 +89,16 @@ function Post(data) {
       });
     }
 
-
     function sharePost() {
-      $.ajax({
-        url: "/api/posts/" + self.id + "/share/",
-        type: "post"
-      }).done(function(data) {
-        alert("You shared this post");
-        return new Post(data);
-      });
-    }
+        $.ajax({
+          url: "/api/posts/" + self.id + "/share/",
+          type: "post"
+        }).done(function(data) {
+          alert("You shared this post");
+          return new Post(data);
+        });
+      }
+
 }
 
 
@@ -107,10 +107,7 @@ function PostContainer(url, append) {
   self.posts = ko.observableArray([]);
   self.nextPostContent = ko.observable("");
   self.append = append;
-  
-  self.addPost = addPost;
-  self.sharePost = sharePost;
-  self.removePost = removePost;
+
   self.mapPosts = mapPosts;
 
   init();
@@ -119,7 +116,7 @@ function PostContainer(url, append) {
 
 
   function init() {
-   loopPages(url); 
+   loopPages(url);
   }
 
   function mapPosts(posts) {
@@ -138,8 +135,10 @@ function PostContainer(url, append) {
     });
   };
 
+}
 
-  function addPost() {
+PostContainer.prototype = {
+  addPost: function() {
       if (!self.nextPostContent()) {
         alert("Please add some content")
         return;
@@ -155,22 +154,21 @@ function PostContainer(url, append) {
               }
               alert("Success. You can see your post in your profile.");
           });
-  };
+  },
 
-  function removePost(post) {
-    var conf = confirm("Are you sure you want to delete this post?");
-    if(conf == true) {
-      self.posts.remove(post);
-      post.removePost();
-    }
-  }
-
-  function sharePost(post) {
+  sharePost: function(post) {
     var new_post = post.sharePost();
     if(self.append) {
       self.posts.unshift(new_post);
     }
-  };
+  },
+  removePost:  function (post) {
+      var conf = confirm("Are you sure you want to delete this post?");
+      if(conf == true) {
+        self.posts.remove(post);
+        post.removePost();
+      }
+    }
 
 }
 
@@ -186,4 +184,3 @@ function logout(){
         });
     }
 }
-

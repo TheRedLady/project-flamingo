@@ -12,20 +12,21 @@ function ProfileViewModel() {
 
 
     //----
-    
+
 
     function init() {
+      PostContainer.call(this, "/api/posts/?posted_by=" + getId(), true);
       $.ajax({
         url: "/api/profiles/" + self.current_profile + "/follow/",
         type: "get"
       }).done(function(data) {
         self.following(data['following']);
       });
-      
+
     }
 
     function follow() {
-      var url = "/api/profiles/" + self.current_profile; 
+      var url = "/api/profiles/" + self.current_profile;
       if(self.following()) {
         url += "/unfollow/";
       }
@@ -69,7 +70,6 @@ function ProfileViewModel() {
     }
 }
 
-var cont = new PostContainer("/api/posts/search/?posted_by=" + getId(), true);
-ProfileViewModel.prototype = Object.create(cont);
+ProfileViewModel.prototype = Object.create(PostContainer.prototype);
 
 ko.applyBindings(new ProfileViewModel());
