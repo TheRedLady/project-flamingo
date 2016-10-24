@@ -21,19 +21,23 @@ function SearchViewModel() {
     self.postTabSelected = ko.observable();
     self.profileTabSelected = ko.observable();
 
+    init();
+
+    function init() {
+        PostContainer.call(self, "/api/posts/search/" + self.searchText(), false)
+    }
 
     self.goToFolder = function(folder) {
         self.chosenFolderId(folder);
         if (folder === 'Posts') {
-//            PostContainer.call(this, "/api/posts/search/" + self.searchText(), false);
-            self.loopPages("/api/posts/search/" + self.searchText());
-            console.log(self.posts())
+            self.posts([]);
+            self.loopPages(self, "/api/posts/search/" + self.searchText());
             self.postTabSelected(true);
             self.profileTabSelected(false);
         } else {
             self.postTabSelected(false);
             self.profileTabSelected(true);
-            if (!self.searchText()) {self.posts(null); self.profileResults([]); return;}
+            if (!self.searchText()) {self.posts([]); self.profileResults([]); return;}
             $.getJSON('/api/profiles/search/' + self.searchText(), {}, function(allData) {
             var mappedProfiles= $.map(allData['results'], function(item) { return new Profile(item) });
             self.profileResults(mappedProfiles);
@@ -43,8 +47,8 @@ function SearchViewModel() {
 
     self.findResults = function () {
         self.goToFolder('Posts');
-        PostContainer.call(this, "/api/posts/search/" + self.searchText(), false);
     }
+
 };
 
 SearchViewModel.prototype = Object.create(PostContainer.prototype);

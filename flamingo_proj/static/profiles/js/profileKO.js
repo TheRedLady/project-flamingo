@@ -10,10 +10,6 @@ function ProfileViewModel() {
 
     init();
 
-
-    //----
-
-
     function init() {
       PostContainer.call(this, "/api/posts/?posted_by=" + getId(), true);
       $.ajax({

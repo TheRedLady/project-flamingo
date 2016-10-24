@@ -42,7 +42,6 @@ function Post(data) {
     self.liked = ko.observable(data['liked']);
 
     self.likeUnlike = likeUnlike;
-//    self.sharePost = sharePost;
     self.removePost = removePost;
 
     init();
@@ -86,19 +85,6 @@ function Post(data) {
           type: "delete"
       });
     }
-
-//    function sharePost() {
-//        $.ajax({
-//          url: "/api/posts/" + self.id + "/share/",
-//          type: "post"
-//        }).done(function(data) {
-//            console.log("Making post with: ")
-//            console.log(data)
-//          return data;
-//          alert("You shared this post");
-//        });
-//      }
-
 }
 
 
@@ -108,36 +94,27 @@ function PostContainer(url, append) {
   self.nextPostContent = ko.observable("");
   self.append = append;
 
-  self.mapPosts = mapPosts;
-
   init();
 
-  //---------
-
-
   function init() {
-   loopPages(url);
+    PostContainer.prototype.loopPages(self, url);
   }
+}
 
-  function mapPosts(posts) {
-    var mappedPosts = $.map(posts, function(post) { return new Post(post); })
-    for(let i = 0; i < mappedPosts.length; i++) {
-      self.posts.push(mappedPosts[i]);
-    }
-  }
+PostContainer.prototype = {
 
-  function loopPages(url) {
+  loopPages: function(obj, url) {
     $.getJSON(url, function(data) {
-      self.mapPosts(data['results']);
+        var mappedPosts = $.map(data['results'], function(post) { return new Post(post); })
+        for(let i = 0; i < mappedPosts.length; i++) {
+          obj.posts.push(mappedPosts[i]);
+        }
+
       if(data['next'] != null){
         loopPages(data['next']);
       }
     });
-  };
-
-}
-
-PostContainer.prototype = {
+  },
 
   addPost: function() {
       if (!self.nextPostContent()) {
@@ -163,11 +140,7 @@ PostContainer.prototype = {
       url: "/api/posts/" + post.id + "/share/",
       type: "post"
     }).done(function(data) {
-        console.log(post.id)
-        console.log(self.posts)
-        console.log("Making post with: ")
-        console.log(data)
-        self.posts.unshift(new Post(data));
+      if (self.append) {self.posts.unshift(new Post(data));}
       alert("You shared this post");
     });
   },
