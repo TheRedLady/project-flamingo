@@ -42,7 +42,7 @@ function Post(data) {
     self.liked = ko.observable(data['liked']);
 
     self.likeUnlike = likeUnlike;
-    self.sharePost = sharePost;
+//    self.sharePost = sharePost;
     self.removePost = removePost;
 
     init();
@@ -84,20 +84,20 @@ function Post(data) {
       $.ajax({
           url: "/api/posts/" + self.id,
           type: "delete"
-      }).done(function() {
-        alert("You deleted this post");
       });
     }
 
-    function sharePost() {
-        $.ajax({
-          url: "/api/posts/" + self.id + "/share/",
-          type: "post"
-        }).done(function(data) {
-          alert("You shared this post");
-          return new Post(data);
-        });
-      }
+//    function sharePost() {
+//        $.ajax({
+//          url: "/api/posts/" + self.id + "/share/",
+//          type: "post"
+//        }).done(function(data) {
+//            console.log("Making post with: ")
+//            console.log(data)
+//          return data;
+//          alert("You shared this post");
+//        });
+//      }
 
 }
 
@@ -138,6 +138,7 @@ function PostContainer(url, append) {
 }
 
 PostContainer.prototype = {
+
   addPost: function() {
       if (!self.nextPostContent()) {
         alert("Please add some content")
@@ -157,11 +158,20 @@ PostContainer.prototype = {
   },
 
   sharePost: function(post) {
-    var new_post = post.sharePost();
-    if(self.append) {
-      self.posts.unshift(new_post);
-    }
+
+    $.ajax({
+      url: "/api/posts/" + post.id + "/share/",
+      type: "post"
+    }).done(function(data) {
+        console.log(post.id)
+        console.log(self.posts)
+        console.log("Making post with: ")
+        console.log(data)
+        self.posts.unshift(new Post(data));
+      alert("You shared this post");
+    });
   },
+
   removePost:  function (post) {
       var conf = confirm("Are you sure you want to delete this post?");
       if(conf == true) {
