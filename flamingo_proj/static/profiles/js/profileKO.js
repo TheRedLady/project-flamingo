@@ -1,5 +1,5 @@
 function ProfileViewModel() {
-    var self = this;
+    self = this;
     self.current_profile = getId();
     self.following = ko.observable();
     self.showMessageBox = ko.observable(false);
@@ -7,11 +7,13 @@ function ProfileViewModel() {
 
     self.follow = follow;
 
-
     init();
 
+
+    //---------
+
     function init() {
-      PostContainer.call(this, "/api/posts/?posted_by=" + getId(), true);
+      PostContainer.call(self, "/api/posts/?posted_by=" + getId(), true);
       $.ajax({
         url: "/api/profiles/" + self.current_profile + "/follow/",
         type: "get"
@@ -44,10 +46,6 @@ function ProfileViewModel() {
     }
 
     self.sendMessage = function() {
-
-        console.log("Sending: " + self.messageBoxContent() +
-                    " To: " + self.current_profile
-        );
 
         if (!self.messageBoxContent()) {
           alert("Please add some content")

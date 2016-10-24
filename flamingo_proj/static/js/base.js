@@ -42,7 +42,7 @@ function Post(data) {
     self.liked = ko.observable(data['liked']);
 
     self.likeUnlike = likeUnlike;
-//    self.removePost = removePost;
+    self.removePost = removePost;
 
     init();
 
@@ -79,17 +79,17 @@ function Post(data) {
     };
 
 
-//    function removePost() {
-//      $.ajax({
-//          url: "/api/posts/" + self.id,
-//          type: "delete"
-//      });
-//    }
+    function removePost() {
+      $.ajax({
+          url: "/api/posts/" + self.id,
+          type: "delete"
+      });
+    }
 }
 
 
 function PostContainer(url, append) {
-  var self = this;
+  self = this;
   self.posts = ko.observableArray([]);
   self.nextPostContent = ko.observable("");
   self.append = append;
@@ -97,22 +97,21 @@ function PostContainer(url, append) {
   init();
 
   function init() {
-    PostContainer.prototype.loopPages(self, url);
+    self.loopPages(url);
   }
 }
 
 PostContainer.prototype = {
 
-  loopPages: function(obj, url) {
+  loopPages: function(url) {
     $.getJSON(url, function(data) {
         var mappedPosts = $.map(data['results'], function(post) { return new Post(post); })
         for(let i = 0; i < mappedPosts.length; i++) {
-          obj.posts.push(mappedPosts[i]);
+          self.posts.push(mappedPosts[i]);
         }
-
-      if(data['next'] != null){
-        PostContainer.prototype.loopPages(obj, data['next']);
-      }
+        if(data['next'] != null){
+          self.loopPages(data['next']);
+        }
     });
   },
 
@@ -135,28 +134,25 @@ PostContainer.prototype = {
   },
 
   sharePost: function(post) {
-
     $.ajax({
       url: "/api/posts/" + post.id + "/share/",
       type: "post"
     }).done(function(data) {
-      if (self.append) {self.posts.unshift(new Post(data));}
+      if(self.append) {
+        self.posts.unshift(new Post(data));
+      }
       alert("You shared this post");
     });
   },
-
+  
   removePost: function (post) {
       var conf = confirm("Are you sure you want to delete this post?");
       if(conf === true) {
-          $.ajax({
-          url: "/api/posts/" + post.id,
-          type: "delete"
-          }).done(function() {
-            console.log(self.posts)
-//            self.posts.remove(post)
-          });
+        post.removePost();
+        self.posts.remove(post);
       }
   }
+  
 }
 
 

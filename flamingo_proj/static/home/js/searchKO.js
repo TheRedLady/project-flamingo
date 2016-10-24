@@ -11,8 +11,7 @@ function Profile(data) {
 }
 
 function SearchViewModel() {
-
-    var self = this;
+    self = this;
     self.folders = ['Posts', 'Profiles'];
     self.chosenFolderId = ko.observable();
     self.searchText = ko.observable();
@@ -23,15 +22,18 @@ function SearchViewModel() {
 
     init();
 
+
+    //------------
+
     function init() {
-        PostContainer.call(self, "/api/posts/search/" + self.searchText(), false)
+        PostContainer.call(self, "/api/posts/search/" + self.searchText(), true)
     }
 
     self.goToFolder = function(folder) {
         self.chosenFolderId(folder);
         if (folder === 'Posts') {
             self.posts([]);
-            self.loopPages(self, "/api/posts/search/" + self.searchText());
+            self.loopPages("/api/posts/search/" + self.searchText());
             self.postTabSelected(true);
             self.profileTabSelected(false);
         } else {
