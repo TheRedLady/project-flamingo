@@ -42,7 +42,7 @@ function Post(data) {
     self.liked = ko.observable(data['liked']);
 
     self.likeUnlike = likeUnlike;
-    self.removePost = removePost;
+//    self.removePost = removePost;
 
     init();
 
@@ -79,12 +79,12 @@ function Post(data) {
     };
 
 
-    function removePost() {
-      $.ajax({
-          url: "/api/posts/" + self.id,
-          type: "delete"
-      });
-    }
+//    function removePost() {
+//      $.ajax({
+//          url: "/api/posts/" + self.id,
+//          type: "delete"
+//      });
+//    }
 }
 
 
@@ -111,7 +111,7 @@ PostContainer.prototype = {
         }
 
       if(data['next'] != null){
-        loopPages(data['next']);
+        PostContainer.prototype.loopPages(obj, data['next']);
       }
     });
   },
@@ -145,14 +145,18 @@ PostContainer.prototype = {
     });
   },
 
-  removePost:  function (post) {
+  removePost: function (post) {
       var conf = confirm("Are you sure you want to delete this post?");
-      if(conf == true) {
-        self.posts.remove(post);
-        post.removePost();
+      if(conf === true) {
+          $.ajax({
+          url: "/api/posts/" + post.id,
+          type: "delete"
+          }).done(function() {
+            console.log(self.posts)
+//            self.posts.remove(post)
+          });
       }
-    }
-
+  }
 }
 
 
