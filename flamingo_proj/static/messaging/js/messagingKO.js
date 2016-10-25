@@ -22,10 +22,14 @@ function MessagesViewModel() {
     self.goToFolder = function(folder) {
         self.chosenFolderId(folder);
         self.chosenMailData(null);
-        $.getJSON('/api/messaging', { folder: folder }, function(allData) {
-        var mappedMails = $.map(allData['results'], function(item) { return new Message(item) });
-        self.messages(mappedMails);
-        self.showMessageBox(false);
+        $.getJSON('/api/messaging', {
+            folder: folder
+        }, function(allData) {
+            var mappedMails = $.map(allData['results'], function(item) {
+                return new Message(item)
+            });
+            self.messages(mappedMails);
+            self.showMessageBox(false);
         });
     }
 
@@ -38,12 +42,12 @@ function MessagesViewModel() {
 
     self.moveToTrash = function(mail) {
         var conf = confirm("Are you sure you want to delete this message?");
-        if(conf == true) {
+        if (conf == true) {
             self.chosenMailData(null);
             $.ajax({
                 url: "/api/messaging/" + mail.id() + "/",
                 type: "delete"
-            }).done(function(result){
+            }).done(function(result) {
                 self.messages.remove(mail);
             });
         }
@@ -52,10 +56,12 @@ function MessagesViewModel() {
     self.openMessageBox = function() {
         if (self.showMessageBox()) {
             self.showMessageBox(false);
-        } else { self.showMessageBox(true); }
+        } else {
+            self.showMessageBox(true);
+        }
     }
 
-    self.sendTo = function () {
+    self.sendTo = function() {
         if (self.chosenFolderId() === "Inbox") {
             return self.chosenMailData().sender_id()
         } else if (self.chosenFolderId() === "Sent") {
@@ -70,23 +76,22 @@ function MessagesViewModel() {
     }
 
     self.sendMessage = function() {
-        console.log("Sending: " + self.messageBoxContent() +
-                    " To: " + self.sendTo()
-        );
         if (!self.messageBoxContent()) {
-          alert("Please add some content")
-          return;
+            alert("Please add some content")
+            return;
         }
 
         $.ajax("/api/messaging/", {
-            data: {message_body: self.messageBoxContent() ,
-                   recipient: self.sendTo()},
+            data: {
+                message_body: self.messageBoxContent(),
+                recipient: self.sendTo()
+            },
             type: "post",
         }).done(function() {
-              alert("Message Sent!");
-              self.messageBoxContent('');
-              self.showMessageBox(false);
-           });
+            alert("Message Sent!");
+            self.messageBoxContent('');
+            self.showMessageBox(false);
+        });
     }
 
     self.goToFolder('Inbox');

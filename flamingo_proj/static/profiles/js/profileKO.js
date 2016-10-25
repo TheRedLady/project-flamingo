@@ -13,54 +13,57 @@ function ProfileViewModel() {
     //---------
 
     function init() {
-      PostContainer.call(self, "/api/posts/?posted_by=" + getId(), true);
-      $.ajax({
-        url: "/api/profiles/" + self.current_profile + "/follow/",
-        type: "get"
-      }).done(function(data) {
-        self.following(data['following']);
-      });
+        PostContainer.call(self, "/api/posts/?posted_by=" + getId(), true);
+        $.ajax({
+            url: "/api/profiles/" + self.current_profile + "/follow/",
+            type: "get"
+        }).done(function(data) {
+            self.following(data['following']);
+        });
 
     }
 
     function follow() {
-      var url = "/api/profiles/" + self.current_profile;
-      if(self.following()) {
-        url += "/unfollow/";
-      }
-      else {
-        url += "/follow/";
-      }
-      $.ajax({
-        url: url,
-        method: "POST",
-      }).done(function (data) {
-        self.following(data['following']);
-      });
+        var url = "/api/profiles/" + self.current_profile;
+        if (self.following()) {
+            url += "/unfollow/";
+        } else {
+            url += "/follow/";
+        }
+        $.ajax({
+            url: url,
+            method: "POST",
+        }).done(function(data) {
+            self.following(data['following']);
+        });
     };
 
     self.openMessageBox = function() {
         if (self.showMessageBox()) {
             self.showMessageBox(false);
-        } else { self.showMessageBox(true); }
+        } else {
+            self.showMessageBox(true);
+        }
     }
 
     self.sendMessage = function() {
 
         if (!self.messageBoxContent()) {
-          alert("Please add some content")
-          return;
+            alert("Please add some content")
+            return;
         }
 
         $.ajax("/api/messaging/", {
-            data: ko.toJSON( {message_body: self.messageBoxContent() ,
-                              recipient: self.current_profile}),
+            data: ko.toJSON({
+                message_body: self.messageBoxContent(),
+                recipient: self.current_profile
+            }),
             type: "post",
             contentType: "application/json",
         }).done(function() {
-              alert("Message Sent!");
-              self.messageBoxContent('');
-           });
+            alert("Message Sent!");
+            self.messageBoxContent('');
+        });
     }
 }
 

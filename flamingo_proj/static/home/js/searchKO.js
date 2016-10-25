@@ -4,8 +4,7 @@ function Profile(data) {
     this.email = ko.observable(data.user['email']);
     this.profileId = ko.observable(data.user['id']);
 
-    this.goToProfile = function () {
-        console.log(data)
+    this.goToProfile = function() {
         window.location.href = "/profile/" + this.profileId();
     }
 }
@@ -41,15 +40,21 @@ function SearchViewModel() {
         } else {
             self.postTabSelected(false);
             self.profileTabSelected(true);
-            if (!self.searchText()) {self.posts([]); self.profileResults([]); return;}
+            if (!self.searchText()) {
+                self.posts([]);
+                self.profileResults([]);
+                return;
+            }
             $.getJSON('/api/profiles/search/' + self.searchText(), {}, function(allData) {
-            var mappedProfiles= $.map(allData['results'], function(item) { return new Profile(item) });
-            self.profileResults(mappedProfiles);
+                var mappedProfiles = $.map(allData['results'], function(item) {
+                    return new Profile(item)
+                });
+                self.profileResults(mappedProfiles);
             });
         }
     }
 
-    self.findResults = function () {
+    self.findResults = function() {
         self.goToFolder('Posts');
     }
 
