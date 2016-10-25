@@ -33,9 +33,11 @@ function SearchViewModel() {
         self.chosenFolderId(folder);
         if (folder === 'Posts') {
             self.posts([]);
-            self.loopPages("/api/posts/search/" + self.searchText());
             self.postTabSelected(true);
             self.profileTabSelected(false);
+            if (self.searchText()) {
+                self.loopPages("/api/posts/search/" + self.searchText());
+            }
         } else {
             self.postTabSelected(false);
             self.profileTabSelected(true);
