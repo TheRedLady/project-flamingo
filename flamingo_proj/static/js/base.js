@@ -104,15 +104,19 @@ function PostContainer(url, append) {
 PostContainer.prototype = {
 
   loopPages: function(url) {
-    $.getJSON(url, function(data) {
-        var mappedPosts = $.map(data['results'], function(post) { return new Post(post); })
-        for(let i = 0; i < mappedPosts.length; i++) {
-          self.posts.push(mappedPosts[i]);
-        }
-        if(data['next'] != null){
-          self.loopPages(data['next']);
-        }
-    });
+      $.getJSON(url, function(data) {
+          if (data['results']) {
+              var mappedPosts = $.map(data['results'], function(post) { return new Post(post); })
+              for(let i = 0; i < mappedPosts.length; i++) {
+                  self.posts.push(mappedPosts[i]);
+              }
+              if(data['next'] != null){
+                  self.loopPages(data['next']);
+              }
+          } else {
+              self.posts.push(new Post(data));
+          }
+      });
   },
 
   addPost: function() {

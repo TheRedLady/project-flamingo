@@ -3,9 +3,7 @@
 
 {% block content %}
 
-{% include 'post.html' %}
-
-<div data-bind="template: { name: 'post-template', data: post() }"></div>
+{% include 'display_posts.html' %}
 
 <script language="javascript" type="text/javascript" src="{% static 'posts/js/postKO.js' %}"></script>
 
