@@ -79,7 +79,7 @@ function Post(data) {
 
     function removePost() {
         $.ajax({
-            url: "/api/posts/" + self.id,
+            url: "/api/posts/" + self.id + "/",
             type: "delete"
         });
     }

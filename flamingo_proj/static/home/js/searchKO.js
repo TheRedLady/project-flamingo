@@ -25,7 +25,7 @@ function SearchViewModel() {
     //------------
 
     function init() {
-        PostContainer.call(self, "/api/posts/search/" + self.searchText(), true)
+        PostContainer.call(self, "/api/posts/search/" + self.searchText() + "/", true)
     }
 
     self.goToFolder = function(folder) {
