@@ -2,7 +2,7 @@ function Tag(data) {
     this.tag = ko.observable(data.tag_clean);
     this.occurrences_count = ko.observable(data.tag_occurrences_count);
 
-    this.goToTag = function () {
+    this.goToTag = function() {
         window.location.href = "/posts/tag/" + this.tag();
     }
 }
@@ -13,8 +13,10 @@ function MessagesViewModel() {
 
     self.getTags = function() {
         $.getJSON('/api/posts/trending/', function(allData) {
-        var mappedTags = $.map(allData['results'], function(item) { return new Tag(item) });
-        self.tags(mappedTags);
+            var mappedTags = $.map(allData['results'], function(item) {
+                return new Tag(item)
+            });
+            self.tags(mappedTags);
         });
     }
 

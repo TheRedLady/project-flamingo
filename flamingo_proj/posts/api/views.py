@@ -3,7 +3,6 @@ from home.utils import get_query, get_key
 from posts.models import Post, Like, Tag, Share
 from .serializers import (
     PostDetailSerializer,
-    PostListSerializer,
     PostLikeSerializer,
     PostShareSerializer,
     PostTrendingSerializer,
@@ -157,6 +156,6 @@ class PostsSearchAPIView(ListAPIView):
 
     def get_queryset(self):
         q = self.kwargs['q']
-        posts_query = get_query(q, ['tag__tag'], tag=True)
-        posts = Post.objects.filter(posts_query).order_by('-created')
+        posts_query = get_query(q, ['tag__tag'])
+        posts = Post.objects.filter(posts_query).order_by('-created').distinct()
         return posts
