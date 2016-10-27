@@ -6,6 +6,7 @@ from django.db.models import Q
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 
 class MessageViewSet(ModelViewSet):
@@ -29,6 +30,7 @@ class MessageViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
+        return Response(serializer.data)
 
     def perform_destroy(self, instance):
         user_id = self.request.user.id

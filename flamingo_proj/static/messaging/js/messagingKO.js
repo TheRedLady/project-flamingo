@@ -87,9 +87,13 @@ function MessagesViewModel() {
                 recipient: self.sendTo()
             },
             type: "post",
-        }).done(function() {
+        }).done(function(data) {
             alert("Message Sent!");
             self.messageBoxContent('');
+            self.chosenMailData(null);
+            if (self.chosenFolderId() === "Sent") {
+                self.messages.unshift(new Message(data));
+            }
             self.showMessageBox(false);
         });
     }

@@ -156,6 +156,6 @@ class PostsSearchAPIView(ListAPIView):
 
     def get_queryset(self):
         q = self.kwargs['q']
-        posts_query = get_query(q, ['tag__tag'], tag=True)
+        posts_query = get_query(q, ['tag__tag'])
         posts = Post.objects.filter(posts_query).order_by('-created').distinct()
         return posts

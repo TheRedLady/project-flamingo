@@ -31,12 +31,21 @@ getId = function() {
     return id;
 }
 
+urlify = function(text) {
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, function(url) {
+        console.log('<a href="' + url + '" target="_blank"' + '>' + url + '</a>')
+        return '<a href="' + url + '" target="_blank"' + '>' + url + '</a>';
+    })
+}
+
+
 function Post(data) {
     var self = this;
     self.id = data['id'];
     self.url = data['url'];
     self.posted_by = data['posted_by'];
-    self.content = data['content'];
+    self.content = urlify(data['content']);
     self.created = data['created'];
     self.likes = ko.observable(data['like_count']);
     self.liked = ko.observable(data['liked']);
